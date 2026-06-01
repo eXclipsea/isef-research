@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from .searxng import searxng_search, searxng_papers
 from .fetcher import fetch_page_text
 from .papers import search_all_papers, get_crossref_citation, get_unpaywall_pdf
-from .synthesizer import synthesize
+from .synthesizer import synthesize, extract_topics
 
 router = APIRouter()
 
@@ -16,6 +16,18 @@ class SearchBody(BaseModel):
     query: str
     mode: Literal["web", "papers", "all"] = "all"
     num_results: int = 8
+
+
+class SourceRef(BaseModel):
+    title: str = ""
+    url: str = ""
+    snippet: str = ""
+    abstract: str = ""
+
+
+class TopicsBody(BaseModel):
+    query: str
+    sources: list[SourceRef]
 
 
 @router.post("")
@@ -58,6 +70,28 @@ async def search(body: SearchBody):
 async def fetch_url(url: str):
     text = await fetch_page_text(url)
     return {"url": url, "text": text}
+
+
+@router.post("/topics")
+async def generate_topics(body: TopicsBody):
+    # fetch full page text for each selected source (papers may have no url → use abstract)
+    async def enrich(src: SourceRef) -> dict:
+        text = ""
+        if src.url:
+            try:
+                text = await fetch_page_text(src.url)
+            except Exception:
+                text = ""
+        return {
+            "title": src.title,
+            "url": src.url,
+            "text": text,
+            "snippet": src.snippet,
+            "abstract": src.abstract,
+        }
+
+    enriched = await asyncio.gather(*[enrich(s) for s in body.sources])
+    return extract_topics(body.query, enriched)
 
 
 @router.get("/papers")

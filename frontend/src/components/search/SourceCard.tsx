@@ -2,13 +2,18 @@ import { useState } from 'react'
 import type { PaperResult, WebResult } from '../../types'
 import { getCitationFromDoi, getPdfFromDoi } from '../../api/search'
 
-interface Props { source: PaperResult | WebResult; index: number }
+interface Props {
+  source: PaperResult | WebResult
+  index: number
+  selected?: boolean
+  onToggle?: () => void
+}
 
 function isPaper(s: PaperResult | WebResult): s is PaperResult {
   return 'authors' in s
 }
 
-export function SourceCard({ source, index }: Props) {
+export function SourceCard({ source, index, selected, onToggle }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [citation, setCitation] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -42,6 +47,14 @@ export function SourceCard({ source, index }: Props) {
   return (
     <div style={{ marginBottom: '14px', paddingBottom: '14px', borderBottom: '1px solid var(--border-light)' }}>
       <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+        {onToggle && (
+          <input
+            type="checkbox"
+            checked={!!selected}
+            onChange={onToggle}
+            style={{ marginTop: '3px', flexShrink: 0, accentColor: '#fff', cursor: 'pointer' }}
+          />
+        )}
         <span style={{ flexShrink: 0, fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', paddingTop: '2px', minWidth: '20px' }}>
           [{index}]
         </span>

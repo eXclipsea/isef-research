@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function NotesSidebar({ onRefresh: _onRefresh }: Props) {
-  const { notes, selectedId, selectNote, upsertNote } = useNotesStore()
+  const { notes, activeTabId, openTab, upsertNote } = useNotesStore()
   const [query, setQuery] = useState('')
   const [activeTag, setActiveTag] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
@@ -29,7 +29,7 @@ export function NotesSidebar({ onRefresh: _onRefresh }: Props) {
     if (!newTitle.trim()) return
     const note = await createNote({ title: newTitle.trim(), content: '', tags: [] })
     upsertNote(note)
-    selectNote(note.id)
+    openTab(note.id)
     setCreating(false)
     setNewTitle('')
   }
@@ -135,16 +135,16 @@ export function NotesSidebar({ onRefresh: _onRefresh }: Props) {
         {displayed.map((note) => (
           <div
             key={note.id}
-            onClick={() => selectNote(note.id)}
+            onClick={() => openTab(note.id)}
             style={{
               padding: '7px 14px',
               cursor: 'pointer',
               borderBottom: '1px solid var(--border-light)',
-              background: selectedId === note.id ? 'var(--bg-surface)' : 'transparent',
-              borderLeft: `2px solid ${selectedId === note.id ? 'var(--text-secondary)' : 'transparent'}`,
+              background: activeTabId === note.id ? 'var(--bg-surface)' : 'transparent',
+              borderLeft: `2px solid ${activeTabId === note.id ? 'var(--text-secondary)' : 'transparent'}`,
             }}
-            onMouseEnter={(e) => { if (selectedId !== note.id) (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-hover)' }}
-            onMouseLeave={(e) => { if (selectedId !== note.id) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
+            onMouseEnter={(e) => { if (activeTabId !== note.id) (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-hover)' }}
+            onMouseLeave={(e) => { if (activeTabId !== note.id) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
           >
             <div style={{ fontSize: '13px', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', marginBottom: '2px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
               {note.title}

@@ -7,7 +7,7 @@ interface Props { noteId: string }
 
 export function BacklinksPanel({ noteId }: Props) {
   const [backlinks, setBacklinks] = useState<Note[]>([])
-  const { selectNote } = useNotesStore()
+  const { openTab } = useNotesStore()
 
   useEffect(() => { getNoteBacklinks(noteId).then(setBacklinks) }, [noteId])
 
@@ -27,7 +27,7 @@ export function BacklinksPanel({ noteId }: Props) {
         {backlinks.map((note) => (
           <button
             key={note.id}
-            onClick={() => selectNote(note.id)}
+            onClick={() => openTab(note.id)}
             style={{
               background: 'none', border: 'none',
               color: 'var(--text-secondary)', fontSize: '13px',

@@ -4,27 +4,43 @@ import { listNotes, getNote } from '../../api/notes'
 import { NotesSidebar } from './NotesSidebar'
 import { NoteEditor } from './NoteEditor'
 import { BacklinksPanel } from './BacklinksPanel'
+import { TabBar } from './TabBar'
+import { MindMap } from './MindMap'
 
 export function NotesPanel() {
-  const { notes, selectedId, setNotes, upsertNote } = useNotesStore()
+  const { notes, openTabs, activeTabId, view, setNotes, upsertNote } = useNotesStore()
 
   useEffect(() => { listNotes().then(setNotes) }, [])
 
+  // load full content for any open tab that lacks it
   useEffect(() => {
-    if (selectedId) getNote(selectedId).then(upsertNote)
-  }, [selectedId])
+    for (const id of openTabs) {
+      const note = notes.find((n) => n.id === id)
+      if (note && note.content === undefined) {
+        getNote(id).then(upsertNote)
+      }
+    }
+  }, [openTabs])
 
-  const selectedNote = selectedId ? notes.find((n) => n.id === selectedId) : null
+  const activeNote = activeTabId ? notes.find((n) => n.id === activeTabId) : null
 
   return (
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
       <NotesSidebar />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-base)' }}>
-        {selectedNote ? (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-base)', minWidth: 0 }}>
+        <TabBar />
+
+        {view === 'mindmap' ? (
+          <MindMap />
+        ) : activeNote && activeNote.content !== undefined ? (
           <>
-            <NoteEditor note={selectedNote} />
-            <BacklinksPanel noteId={selectedNote.id} />
+            <NoteEditor key={activeNote.id} note={activeNote} />
+            <BacklinksPanel noteId={activeNote.id} />
           </>
+        ) : activeNote ? (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+            Loading…
+          </div>
         ) : (
           <div style={{
             flex: 1, display: 'flex', flexDirection: 'column',
@@ -33,7 +49,7 @@ export function NotesPanel() {
           }}>
             <div style={{ fontSize: '28px', lineHeight: 1 }}>✦</div>
             <div style={{ fontSize: '14px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
-              Select or create a note
+              Select a note from the sidebar
             </div>
           </div>
         )}

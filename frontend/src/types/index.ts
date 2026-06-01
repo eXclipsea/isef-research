@@ -52,4 +52,9 @@ export interface SearchResponse {
   paper_results: PaperResult[]
 }
 
+export interface TopicsResult {
+  topics: string[]
+  overview: string
+}
+
 export type PanelId = 'notes' | 'search' | 'documents'

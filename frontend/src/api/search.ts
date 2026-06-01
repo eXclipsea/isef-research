@@ -1,6 +1,18 @@
-import type { SearchResponse, PaperResult } from '../types'
+import type { SearchResponse, PaperResult, TopicsResult } from '../types'
 
 const BASE = '/api/search'
+
+export async function generateTopics(
+  query: string,
+  sources: { title: string; url: string; snippet?: string; abstract?: string }[]
+): Promise<TopicsResult> {
+  const r = await fetch(`${BASE}/topics`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, sources }),
+  })
+  return r.json()
+}
 
 export async function doSearch(query: string, mode: 'web' | 'papers' | 'all' = 'all'): Promise<SearchResponse> {
   const r = await fetch(BASE, {

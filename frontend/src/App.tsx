@@ -26,7 +26,7 @@ export default function App() {
         <div style={{ width: '1px', height: '16px', background: 'var(--border)' }} />
         <PanelControls />
       </div>
-      <div style={{ flex: 1, overflow: 'hidden' }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
         <SplitView />
       </div>
     </div>

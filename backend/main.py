@@ -43,9 +43,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(notes_router, prefix="/notes", tags=["notes"])
-app.include_router(documents_router, prefix="/documents", tags=["documents"])
-app.include_router(search_router, prefix="/search", tags=["search"])
+app.include_router(notes_router, prefix="/api/notes", tags=["notes"])
+app.include_router(documents_router, prefix="/api/documents", tags=["documents"])
+app.include_router(search_router, prefix="/api/search", tags=["search"])
 
 uploads_dir = DATA_DIR / "uploads"
 uploads_dir.mkdir(parents=True, exist_ok=True)
@@ -63,4 +63,8 @@ if FRONTEND_DIST.exists():
 
     @app.get("/{full_path:path}")
     def serve_spa(full_path: str):
+        # never let SPA fallback swallow API calls
+        if full_path.startswith("api/"):
+            from fastapi import HTTPException
+            raise HTTPException(404, "Not found")
         return FileResponse(str(FRONTEND_DIST / "index.html"))

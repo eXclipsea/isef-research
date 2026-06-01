@@ -26,3 +26,41 @@ def synthesize(query: str, sources: list[dict]) -> str:
         messages=[{"role": "user", "content": prompt}],
     )
     return response["message"]["content"]
+
+
+def extract_topics(query: str, sources: list[dict]) -> dict:
+    """Given selected sources (with fetched full text), produce key topics."""
+    if not sources:
+        return {"topics": [], "overview": "No sources selected."}
+
+    blocks = []
+    for i, s in enumerate(sources, 1):
+        body = s.get("text") or s.get("snippet") or s.get("abstract") or ""
+        blocks.append(f"[{i}] {s.get('title', 'Untitled')}\n{body[:1800]}")
+    context = "\n\n".join(blocks)
+
+    prompt = (
+        f"You are a research assistant helping with a science research project on: \"{query}\".\n"
+        f"Read the selected sources below and extract the KEY TOPICS a researcher should know.\n"
+        f"Respond in this exact format:\n"
+        f"OVERVIEW: <2-3 sentence overview>\n"
+        f"TOPICS:\n"
+        f"- <topic 1>: <one sentence explanation with [source number]>\n"
+        f"- <topic 2>: <one sentence explanation with [source number]>\n"
+        f"(give 5-8 topics)\n\n"
+        f"Sources:\n{context}"
+    )
+    response = ollama.chat(model=CHAT_MODEL, messages=[{"role": "user", "content": prompt}])
+    content = response["message"]["content"]
+
+    overview = ""
+    topics = []
+    for line in content.split("\n"):
+        line = line.strip()
+        if line.upper().startswith("OVERVIEW:"):
+            overview = line.split(":", 1)[1].strip()
+        elif line.startswith("-") or line.startswith("•"):
+            topics.append(line.lstrip("-•").strip())
+    if not topics:
+        topics = [l.strip() for l in content.split("\n") if l.strip()]
+    return {"topics": topics, "overview": overview}
