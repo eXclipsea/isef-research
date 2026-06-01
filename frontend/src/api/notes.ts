@@ -13,7 +13,7 @@ export async function getNote(id: string): Promise<Note> {
   return r.json()
 }
 
-export async function createNote(data: { title: string; content: string; tags: string[] }): Promise<Note> {
+export async function createNote(data: { title: string; content: string; tags: string[]; folder?: string | null }): Promise<Note> {
   const r = await fetch(BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -22,7 +22,7 @@ export async function createNote(data: { title: string; content: string; tags: s
   return r.json()
 }
 
-export async function updateNote(id: string, data: Partial<{ title: string; content: string; tags: string[] }>): Promise<Note> {
+export async function updateNote(id: string, data: Partial<{ title: string; content: string; tags: string[]; folder: string | null }>): Promise<Note> {
   const r = await fetch(`${BASE}/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

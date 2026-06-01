@@ -1,3 +1,5 @@
+import re
+
 from ..llm import chat, OllamaUnavailable
 
 
@@ -63,3 +65,60 @@ def extract_topics(query: str, sources: list[dict]) -> dict:
     if not topics:
         topics = [l.strip() for l in content.split("\n") if l.strip()]
     return {"topics": topics, "overview": overview}
+
+
+def research_plan(project: str) -> dict:
+    """Given a description of a science-fair project, produce a starting plan."""
+    prompt = (
+        "You are a mentor helping a high-school student start an ISEF science-fair "
+        "research project. Based on their description, produce a focused starting plan.\n"
+        "Respond in EXACTLY this format with these headers:\n\n"
+        "SUMMARY: <2-3 sentences restating the project and its goal>\n"
+        "QUESTIONS:\n- <research question>\n- <research question>\n"
+        "SEARCHES:\n- <concise search query to find papers>\n- <search query>\n"
+        "SUBTOPICS:\n- <key subtopic to learn>\n- <key subtopic>\n"
+        "OUTLINE:\n1. <step>\n2. <step>\n\n"
+        "Give 3-5 items under each header. Keep search queries short (good for a "
+        "scholarly search engine).\n\n"
+        f"Project description:\n{project}"
+    )
+    try:
+        content = chat(prompt)
+    except OllamaUnavailable as e:
+        return {
+            "summary": f"Research planning unavailable — {e}",
+            "questions": [], "searches": [], "subtopics": [], "outline": [],
+        }
+
+    sections: dict[str, list[str]] = {
+        "questions": [], "searches": [], "subtopics": [], "outline": []
+    }
+    summary = ""
+    current = None
+    header_map = {
+        "QUESTIONS": "questions", "SEARCHES": "searches",
+        "SUBTOPICS": "subtopics", "OUTLINE": "outline",
+    }
+    for raw in content.split("\n"):
+        line = raw.strip()
+        if not line:
+            continue
+        upper = line.upper()
+        if upper.startswith("SUMMARY:"):
+            summary = line.split(":", 1)[1].strip()
+            current = None
+            continue
+        matched = next((v for k, v in header_map.items() if upper.startswith(k)), None)
+        if matched:
+            current = matched
+            continue
+        if current:
+            item = line.lstrip("-•").strip()
+            item = item.lstrip("0123456789.) ").strip()
+            if current == "searches":
+                # strip trailing "(paper search)" notes and wrapping quotes
+                item = re.sub(r"\s*\([^)]*\)\s*$", "", item).strip().strip('"').strip("'")
+            if item:
+                sections[current].append(item)
+
+    return {"summary": summary, **sections}

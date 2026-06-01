@@ -1,7 +1,15 @@
-import type { SearchResponse, PaperResult, TopicsResult } from '../types'
+import type { SearchResponse, PaperResult, TopicsResult, ResearchPlan } from '../types'
 import { jsonOrThrow } from './http'
 
 const BASE = '/api/search'
+
+export async function researchAssistant(project: string): Promise<ResearchPlan> {
+  return jsonOrThrow(await fetch(`${BASE}/assistant`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ project }),
+  }))
+}
 
 export async function generateTopics(
   query: string,

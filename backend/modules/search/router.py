@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from .searxng import searxng_search, searxng_papers, searxng_status
 from .fetcher import fetch_page_text
 from .papers import search_all_papers, get_crossref_citation, get_unpaywall_pdf
-from .synthesizer import synthesize, extract_topics
+from .synthesizer import synthesize, extract_topics, research_plan
 from ..llm import ollama_status
 
 router = APIRouter()
@@ -40,6 +40,16 @@ class SourceRef(BaseModel):
 class TopicsBody(BaseModel):
     query: str
     sources: list[SourceRef]
+
+
+class AssistantBody(BaseModel):
+    project: str
+
+
+@router.post("/assistant")
+async def assistant(body: AssistantBody):
+    """Help a student start their research project."""
+    return research_plan(body.project)
 
 
 @router.get("/health")

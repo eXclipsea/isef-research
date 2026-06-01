@@ -19,12 +19,16 @@ class NoteCreate(BaseModel):
     title: str
     content: str = ""
     tags: list[str] = []
+    folder: Optional[str] = None
 
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
     tags: Optional[list[str]] = None
+    folder: Optional[str] = None
+    # sentinel allows clearing the folder (move to root) by sending folder=""
+
 
 
 @router.get("")
@@ -50,15 +54,17 @@ def create_note(body: NoteCreate):
     filepath = NOTES_DIR / filename
     filepath.write_text(body.content, encoding="utf-8")
 
+    folder = body.folder or None
     with get_conn() as conn:
         conn.execute(
-            "INSERT INTO notes (id, title, filename, created_at, updated_at, tags_json) VALUES (?,?,?,?,?,?)",
-            (note_id, body.title, filename, now, now, json.dumps(body.tags)),
+            "INSERT INTO notes (id, title, filename, created_at, updated_at, tags_json, folder) VALUES (?,?,?,?,?,?,?)",
+            (note_id, body.title, filename, now, now, json.dumps(body.tags), folder),
         )
         upsert_backlinks(conn, note_id, body.content)
 
     return {"id": note_id, "title": body.title, "filename": filename,
-            "created_at": now, "updated_at": now, "tags": body.tags, "content": body.content}
+            "created_at": now, "updated_at": now, "tags": body.tags,
+            "folder": folder, "content": body.content}
 
 
 @router.get("/search")
@@ -111,6 +117,11 @@ def update_note(note_id: str, body: NoteUpdate):
 
         new_title = body.title if body.title is not None else d["title"]
         new_tags = body.tags if body.tags is not None else d["tags"]
+        # folder: None means "unchanged"; empty string means "move to root"
+        if body.folder is None:
+            new_folder = d.get("folder")
+        else:
+            new_folder = body.folder or None
 
         filepath = NOTES_DIR / d["filename"]
         if body.content is not None:
@@ -119,13 +130,13 @@ def update_note(note_id: str, body: NoteUpdate):
         content = filepath.read_text(encoding="utf-8") if filepath.exists() else ""
 
         conn.execute(
-            "UPDATE notes SET title=?, updated_at=?, tags_json=? WHERE id=?",
-            (new_title, now, json.dumps(new_tags), note_id),
+            "UPDATE notes SET title=?, updated_at=?, tags_json=?, folder=? WHERE id=?",
+            (new_title, now, json.dumps(new_tags), new_folder, note_id),
         )
 
     return {"id": note_id, "title": new_title, "filename": d["filename"],
             "created_at": d["created_at"], "updated_at": now,
-            "tags": new_tags, "content": content}
+            "tags": new_tags, "folder": new_folder, "content": content}
 
 
 @router.delete("/{note_id}")

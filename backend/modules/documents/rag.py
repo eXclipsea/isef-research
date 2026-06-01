@@ -38,6 +38,12 @@ def ingest_chunks(doc_id: str, chunks: list[dict]):
 
 def query_document(doc_id: str, filename: str, question: str, n_results: int = 5) -> dict:
     col = _collection(doc_id)
+    if col.count() == 0:
+        return {
+            "answer": "_This document isn't indexed yet (it may have been added while "
+            "Ollama was offline). Delete and re-add it, or restart with ./start.sh._",
+            "citations": [],
+        }
     q_embedding = embed_text(question)
     results = col.query(
         query_embeddings=[q_embedding],

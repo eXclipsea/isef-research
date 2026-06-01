@@ -5,6 +5,7 @@ export interface Note {
   created_at: string
   updated_at: string
   tags: string[]
+  folder?: string | null
   content?: string
 }
 
@@ -14,6 +15,15 @@ export interface Document {
   chunk_count: number
   created_at: string
   doi: string | null
+  kind?: 'pdf' | 'paper'
+  title?: string
+  authors?: string[]
+  year?: number | null
+  abstract?: string
+  url?: string
+  source?: string
+  has_pdf?: boolean
+  indexed?: boolean
 }
 
 export interface Citation {
@@ -56,6 +66,14 @@ export interface SearchResponse {
 export interface TopicsResult {
   topics: string[]
   overview: string
+}
+
+export interface ResearchPlan {
+  summary: string
+  questions: string[]
+  searches: string[]
+  subtopics: string[]
+  outline: string[]
 }
 
 export type PanelId = 'notes' | 'search' | 'documents'

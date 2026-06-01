@@ -11,7 +11,9 @@ from pydantic import BaseModel
 
 from .parser import parse_pdf
 from .rag import ingest_chunks, query_document, delete_collection, extract_key_points
+from .paper_ingest import ingest_paper
 from ..llm import OllamaUnavailable
+from ..search.synthesizer import extract_topics
 
 router = APIRouter()
 
@@ -47,6 +49,27 @@ class QueryBody(BaseModel):
     question: str
 
 
+class PaperRef(BaseModel):
+    title: str = ""
+    authors: list[str] = []
+    year: Optional[int] = None
+    abstract: str = ""
+    snippet: str = ""
+    url: str = ""
+    pdf_url: Optional[str] = None
+    doi: Optional[str] = None
+    source: str = "search"
+
+
+class FromPapersBody(BaseModel):
+    papers: list[PaperRef]
+
+
+class TopicsBody(BaseModel):
+    doc_ids: list[str]
+    project: str = ""
+
+
 @router.post("/upload")
 async def upload_document(file: UploadFile = File(...)):
     if not file.filename.lower().endswith(".pdf"):
@@ -79,6 +102,39 @@ async def upload_document(file: UploadFile = File(...)):
     return meta
 
 
+@router.post("/from-papers")
+async def add_papers(body: FromPapersBody):
+    """Add selected search results to Research documents."""
+    added = []
+    for p in body.papers:
+        meta = await ingest_paper(p.model_dump())
+        save_meta(meta["id"], meta)
+        added.append(meta)
+    return {"added": added}
+
+
+@router.post("/topics")
+def docs_topics(body: TopicsBody):
+    """Generate key topics across selected research documents."""
+    sources = []
+    for doc_id in body.doc_ids:
+        try:
+            meta = load_meta(doc_id)
+        except HTTPException:
+            continue
+        text = meta.get("abstract", "")
+        pdf_path = UPLOADS_DIR / f"{doc_id}.pdf"
+        if pdf_path.exists():
+            chunks = parse_pdf(str(pdf_path))[:8]
+            if chunks:
+                text = "\n\n".join(c["text"] for c in chunks)
+        sources.append({"title": meta.get("title") or meta.get("filename"), "text": text})
+
+    if not sources:
+        return {"topics": [], "overview": "No documents selected."}
+    return extract_topics(body.project or "this research", sources)
+
+
 @router.get("")
 def list_documents():
     return list_all_meta()
@@ -108,9 +164,15 @@ def query_doc(doc_id: str, body: QueryBody):
 def keypoints(doc_id: str):
     meta = load_meta(doc_id)
     pdf_path = UPLOADS_DIR / f"{doc_id}.pdf"
-    if not pdf_path.exists():
-        raise HTTPException(404, "PDF file not found")
-    chunks = parse_pdf(str(pdf_path))
+    if pdf_path.exists():
+        chunks = parse_pdf(str(pdf_path))
+    else:
+        # paper added without a PDF — use its abstract
+        from .parser import chunk_pages
+        abstract = meta.get("abstract", "")
+        if not abstract:
+            raise HTTPException(404, "No text available for this document")
+        chunks = chunk_pages([{"page": 1, "text": abstract}])
     try:
         points = extract_key_points(meta["filename"], chunks)
     except OllamaUnavailable as e:

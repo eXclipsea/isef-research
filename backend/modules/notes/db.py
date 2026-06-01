@@ -22,7 +22,8 @@ def init_db():
                 filename TEXT NOT NULL,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
-                tags_json TEXT NOT NULL DEFAULT '[]'
+                tags_json TEXT NOT NULL DEFAULT '[]',
+                folder TEXT
             );
             CREATE TABLE IF NOT EXISTS backlinks (
                 from_id TEXT NOT NULL,
@@ -31,6 +32,10 @@ def init_db():
             );
             CREATE INDEX IF NOT EXISTS idx_backlinks_to ON backlinks(to_title);
         """)
+        # migration for existing databases created before the folder column
+        cols = {r["name"] for r in conn.execute("PRAGMA table_info(notes)")}
+        if "folder" not in cols:
+            conn.execute("ALTER TABLE notes ADD COLUMN folder TEXT")
 
 
 def extract_wikilinks(content: str) -> list[str]:

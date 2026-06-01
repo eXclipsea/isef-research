@@ -1,7 +1,28 @@
-import type { Document, RAGAnswer } from '../types'
+import type { Document, RAGAnswer, PaperResult, WebResult, TopicsResult } from '../types'
 import { jsonOrThrow } from './http'
 
 const BASE = '/api/documents'
+
+export async function addPapersToResearch(
+  papers: (PaperResult | WebResult)[]
+): Promise<Document[]> {
+  const data = await jsonOrThrow<{ added: Document[] }>(
+    await fetch(`${BASE}/from-papers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ papers }),
+    })
+  )
+  return data.added
+}
+
+export async function generateDocTopics(docIds: string[], project = ''): Promise<TopicsResult> {
+  return jsonOrThrow(await fetch(`${BASE}/topics`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ doc_ids: docIds, project }),
+  }))
+}
 
 export async function listDocuments(): Promise<Document[]> {
   return jsonOrThrow(await fetch(BASE))
