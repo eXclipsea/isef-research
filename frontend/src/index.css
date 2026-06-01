@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --bg-base: #000000;
+  --bg-panel: #0d0d0d;
+  --bg-surface: #141414;
+  --bg-hover: #1c1c1c;
+  --border: #2a2a2a;
+  --border-light: #1f1f1f;
+  --text-primary: #f0f0f0;
+  --text-secondary: #b0b0b0;
+  --text-muted: #666666;
+  --accent: #ffffff;
+  --accent-light: #e0e0e0;
+  --green: #b0b0b0;
+  --red: #cccccc;
+  --yellow: #cccccc;
+  --blue: #cccccc;
+  --font-serif: "Times New Roman", Times, Georgia, serif;
+  --font-mono: "Courier New", Courier, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 15px;
+}
+
+::selection {
+  background: rgba(255,255,255,0.15);
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
+
+input, button, select, textarea {
+  font-family: var(--font-serif);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

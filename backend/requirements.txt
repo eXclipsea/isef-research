@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+chromadb
+pymupdf
+httpx
+beautifulsoup4
+lxml
+ollama
+python-multipart
+aiofiles
+python-dotenv

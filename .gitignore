@@ -1,0 +1,30 @@
+# Python
+backend/venv/
+searxng/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.env
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Data (user files — not committed)
+backend/data/uploads/
+backend/data/notes/
+backend/data/vectordb/
+backend/data/doc_meta/
+backend/data/notes.db
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SearXNG cloned source — tracked via submodule reference only
+searxng/.git/
+searxng/
