@@ -28,6 +28,9 @@ export function RAGChat({ docId }: Props) {
     try {
       const result: RAGAnswer = await queryDocument(docId, question)
       setMessages((m) => [...m, { role: 'assistant', content: result.answer, citations: result.citations }])
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Request failed.'
+      setMessages((m) => [...m, { role: 'assistant', content: `⚠ ${msg}` }])
     } finally {
       setLoading(false)
     }
@@ -35,8 +38,13 @@ export function RAGChat({ docId }: Props) {
 
   async function handleKeyPoints() {
     setLoadingKP(true)
-    setKeypoints(await getKeyPoints(docId))
-    setLoadingKP(false)
+    try {
+      setKeypoints(await getKeyPoints(docId))
+    } catch (e: unknown) {
+      setKeypoints([`⚠ ${e instanceof Error ? e.message : 'Could not extract key points.'}`])
+    } finally {
+      setLoadingKP(false)
+    }
   }
 
   return (

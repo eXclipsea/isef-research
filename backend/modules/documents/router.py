@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 from .parser import parse_pdf
 from .rag import ingest_chunks, query_document, delete_collection, extract_key_points
+from ..llm import OllamaUnavailable
 
 router = APIRouter()
 
@@ -59,7 +60,12 @@ async def upload_document(file: UploadFile = File(...)):
     dest.write_bytes(content)
 
     chunks = parse_pdf(str(dest))
-    ingest_chunks(doc_id, chunks)
+    try:
+        ingest_chunks(doc_id, chunks)
+    except OllamaUnavailable as e:
+        dest.unlink(missing_ok=True)
+        delete_collection(doc_id)
+        raise HTTPException(503, str(e))
 
     from datetime import datetime, timezone
     meta = {
@@ -92,7 +98,10 @@ def delete_document(doc_id: str):
 @router.post("/{doc_id}/query")
 def query_doc(doc_id: str, body: QueryBody):
     meta = load_meta(doc_id)
-    return query_document(doc_id, meta["filename"], body.question)
+    try:
+        return query_document(doc_id, meta["filename"], body.question)
+    except OllamaUnavailable as e:
+        raise HTTPException(503, str(e))
 
 
 @router.get("/{doc_id}/keypoints")
@@ -102,7 +111,10 @@ def keypoints(doc_id: str):
     if not pdf_path.exists():
         raise HTTPException(404, "PDF file not found")
     chunks = parse_pdf(str(pdf_path))
-    points = extract_key_points(meta["filename"], chunks)
+    try:
+        points = extract_key_points(meta["filename"], chunks)
+    except OllamaUnavailable as e:
+        raise HTTPException(503, str(e))
     return {"keypoints": points}
 
 

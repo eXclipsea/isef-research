@@ -50,6 +50,7 @@ export interface SearchResponse {
   summary: string
   web_results: WebResult[]
   paper_results: PaperResult[]
+  warnings?: string[]
 }
 
 export interface TopicsResult {

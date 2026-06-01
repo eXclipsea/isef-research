@@ -8,12 +8,13 @@ const PANELS: { id: PanelId; label: string }[] = [
 ]
 
 export function PanelControls() {
-  const { activePanels, togglePanel } = useLayoutStore()
+  const { columns, togglePanel } = useLayoutStore()
+  const activeIds = columns.flat()
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
       {PANELS.map(({ id, label }) => {
-        const active = activePanels.includes(id)
+        const active = activeIds.includes(id)
         return (
           <button
             key={id}

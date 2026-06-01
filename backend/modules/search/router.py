@@ -4,12 +4,24 @@ from typing import Literal
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from .searxng import searxng_search, searxng_papers
+from .searxng import searxng_search, searxng_papers, searxng_status
 from .fetcher import fetch_page_text
 from .papers import search_all_papers, get_crossref_citation, get_unpaywall_pdf
 from .synthesizer import synthesize, extract_topics
+from ..llm import ollama_status
 
 router = APIRouter()
+
+
+def _dedup(*lists) -> list[dict]:
+    seen, out = set(), []
+    for lst in lists:
+        for p in lst:
+            key = (p.get("title") or "").lower()[:60]
+            if key and key not in seen:
+                seen.add(key)
+                out.append(p)
+    return out
 
 
 class SearchBody(BaseModel):
@@ -30,31 +42,42 @@ class TopicsBody(BaseModel):
     sources: list[SourceRef]
 
 
+@router.get("/health")
+async def search_health():
+    """Quick status of the moving parts so the UI can warn clearly."""
+    sx = await searxng_status()
+    return {"ollama": ollama_status(), "searxng": sx}
+
+
 @router.post("")
 async def search(body: SearchBody):
     web_results, paper_results = [], []
+    warnings: list[str] = []
 
     if body.mode in ("web", "all"):
-        web_results = await searxng_search(body.query, count=body.num_results)
+        try:
+            web_results = await searxng_search(body.query, count=body.num_results)
+            if not web_results:
+                warnings.append(
+                    "No web results — SearXNG may be offline (start it via ./start.sh)."
+                )
+        except Exception as e:
+            warnings.append(f"Web search failed: {e}")
 
     if body.mode in ("papers", "all"):
-        # combine SearXNG science results + direct academic APIs
-        searxng_sci, api_papers = await asyncio.gather(
-            searxng_papers(body.query, count=5),
-            search_all_papers(body.query, limit_each=3),
-        )
-        # merge, dedup by title
-        seen = set()
-        for p in searxng_sci:
-            key = p["title"].lower()[:60]
-            if key not in seen:
-                seen.add(key)
-                paper_results.append(p)
-        for p in api_papers:
-            key = p["title"].lower()[:60]
-            if key not in seen:
-                seen.add(key)
-                paper_results.append(p)
+        try:
+            searxng_sci, api_papers = await asyncio.gather(
+                searxng_papers(body.query, count=5),
+                search_all_papers(body.query, limit_each=3),
+                return_exceptions=True,
+            )
+            sci = searxng_sci if isinstance(searxng_sci, list) else []
+            api = api_papers if isinstance(api_papers, list) else []
+            paper_results = _dedup(sci, api)
+            if not paper_results:
+                warnings.append("No papers found — try broader keywords.")
+        except Exception as e:
+            warnings.append(f"Paper search failed: {e}")
 
     all_sources = web_results + paper_results
     summary = synthesize(body.query, all_sources[:10])
@@ -63,6 +86,7 @@ async def search(body: SearchBody):
         "summary": summary,
         "web_results": web_results,
         "paper_results": paper_results,
+        "warnings": warnings,
     }
 
 
@@ -99,14 +123,11 @@ async def papers_search(q: str, limit: int = 5):
     searxng_sci, api_papers = await asyncio.gather(
         searxng_papers(q, count=limit),
         search_all_papers(q, limit_each=limit),
+        return_exceptions=True,
     )
-    seen, results = set(), []
-    for p in searxng_sci + api_papers:
-        key = p["title"].lower()[:60]
-        if key not in seen:
-            seen.add(key)
-            results.append(p)
-    return {"results": results}
+    sci = searxng_sci if isinstance(searxng_sci, list) else []
+    api = api_papers if isinstance(api_papers, list) else []
+    return {"results": _dedup(sci, api)}
 
 
 @router.get("/citation")

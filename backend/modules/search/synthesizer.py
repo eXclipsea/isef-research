@@ -1,6 +1,4 @@
-import ollama
-
-CHAT_MODEL = "llama3.2"
+from ..llm import chat, OllamaUnavailable
 
 
 def build_synthesis_prompt(query: str, sources: list[dict]) -> str:
@@ -19,13 +17,12 @@ def build_synthesis_prompt(query: str, sources: list[dict]) -> str:
 
 def synthesize(query: str, sources: list[dict]) -> str:
     if not sources:
-        return "No sources available to synthesize."
+        return "_No sources found for this query. Try different keywords, or check that SearXNG is running._"
     prompt = build_synthesis_prompt(query, sources)
-    response = ollama.chat(
-        model=CHAT_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return response["message"]["content"]
+    try:
+        return chat(prompt)
+    except OllamaUnavailable as e:
+        return f"_AI summary unavailable — {e}_\n\nThe sources below were still found."
 
 
 def extract_topics(query: str, sources: list[dict]) -> dict:
@@ -50,8 +47,10 @@ def extract_topics(query: str, sources: list[dict]) -> dict:
         f"(give 5-8 topics)\n\n"
         f"Sources:\n{context}"
     )
-    response = ollama.chat(model=CHAT_MODEL, messages=[{"role": "user", "content": prompt}])
-    content = response["message"]["content"]
+    try:
+        content = chat(prompt)
+    except OllamaUnavailable as e:
+        return {"topics": [], "overview": f"Key-topic extraction unavailable — {e}"}
 
     overview = ""
     topics = []

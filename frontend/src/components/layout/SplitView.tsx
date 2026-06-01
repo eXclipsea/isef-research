@@ -1,49 +1,52 @@
-import { Fragment } from 'react'
-import { Group, Panel, Separator } from 'react-resizable-panels'
 import { useLayoutStore } from '../../store/layoutStore'
+import type { PanelId } from '../../types'
+import { ResizableGroup } from './ResizableGroup'
+import { PanelFrame } from './PanelFrame'
 import { NotesPanel } from '../notes/NotesPanel'
 import { SearchPanel } from '../search/SearchPanel'
 import { DocumentsPanel } from '../documents/DocumentsPanel'
 
-const ALL = [
-  { id: 'notes', Component: NotesPanel },
-  { id: 'search', Component: SearchPanel },
-  { id: 'documents', Component: DocumentsPanel },
-] as const
+const COMPONENTS: Record<PanelId, React.FC> = {
+  notes: NotesPanel,
+  search: SearchPanel,
+  documents: DocumentsPanel,
+}
 
 export function SplitView() {
-  const { activePanels } = useLayoutStore()
-  const panels = ALL.filter((p) => activePanels.includes(p.id as any))
+  const { columns } = useLayoutStore()
+  const signature = columns.map((c) => c.join('+')).join('|')
+
+  const columnNodes = columns.map((col, colIdx) => {
+    const panelNodes = col.map((id) => {
+      const Component = COMPONENTS[id]
+      return (
+        <PanelFrame
+          key={id}
+          id={id}
+          canStackLeft={colIdx > 0}
+          canSplitOut={col.length > 1}
+        >
+          <Component />
+        </PanelFrame>
+      )
+    })
+
+    // single panel in column → no inner stack
+    if (panelNodes.length === 1) return panelNodes[0]
+    return (
+      <ResizableGroup direction="vertical" signature={col.join('+')}>
+        {panelNodes}
+      </ResizableGroup>
+    )
+  })
+
+  if (columnNodes.length === 1) {
+    return <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>{columnNodes[0]}</div>
+  }
 
   return (
-    <Group
-      orientation="horizontal"
-      style={{ height: '100%', display: 'flex', width: '100%', flex: 1 }}
-    >
-      {panels.map(({ id, Component }, i) => (
-        <Fragment key={id}>
-          {i > 0 && (
-            <Separator
-              style={{
-                width: '5px',
-                background: 'var(--border)',
-                cursor: 'col-resize',
-                flexShrink: 0,
-                transition: 'background 0.12s',
-              }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'var(--text-muted)')}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'var(--border)')}
-            />
-          )}
-          <Panel
-            id={id}
-            minSize={15}
-            style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%' }}
-          >
-            <Component />
-          </Panel>
-        </Fragment>
-      ))}
-    </Group>
+    <ResizableGroup direction="horizontal" signature={signature}>
+      {columnNodes}
+    </ResizableGroup>
   )
 }

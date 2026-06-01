@@ -17,6 +17,7 @@ export function SearchPanel() {
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [topics, setTopics] = useState<TopicsResult | null>(null)
   const [topicsLoading, setTopicsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { openTab, upsertNote } = useNotesStore()
 
   const combined: (PaperResult | WebResult)[] = result
@@ -30,8 +31,11 @@ export function SearchPanel() {
     setResult(null)
     setSelected(new Set())
     setTopics(null)
+    setError(null)
     try {
       setResult(await doSearch(query, mode))
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Search failed. Is the backend running?')
     } finally {
       setStatus('done')
     }
@@ -145,8 +149,27 @@ export function SearchPanel() {
           </div>
         )}
 
+        {status === 'done' && error && (
+          <div style={{
+            border: '1px solid var(--red)', borderRadius: '6px', padding: '12px 14px',
+            color: 'var(--text-secondary)', fontSize: '13px', fontFamily: 'var(--font-ui)',
+            lineHeight: 1.5, background: 'rgba(224,97,111,0.06)',
+          }}>
+            <strong style={{ color: 'var(--red)' }}>Search failed.</strong> {error}
+          </div>
+        )}
+
         {status === 'done' && result && (
           <>
+            {result.warnings && result.warnings.length > 0 && (
+              <div style={{
+                border: '1px solid var(--border)', borderLeft: '2px solid var(--yellow)',
+                borderRadius: '4px', padding: '8px 12px', marginBottom: '12px',
+                color: 'var(--text-muted)', fontSize: '12px', fontFamily: 'var(--font-ui)', lineHeight: 1.5,
+              }}>
+                {result.warnings.map((w, i) => <div key={i}>⚠ {w}</div>)}
+              </div>
+            )}
             <SearchSummary summary={result.summary} query={query} />
 
             {/* key topics output */}

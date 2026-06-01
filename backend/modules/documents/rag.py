@@ -1,15 +1,13 @@
 from pathlib import Path
 
 import chromadb
-import ollama
+
+from ..llm import chat, embed as _embed
 
 VECTORDB_DIR = Path(__file__).parent.parent.parent / "data" / "vectordb"
 VECTORDB_DIR.mkdir(parents=True, exist_ok=True)
 
 _client = chromadb.PersistentClient(path=str(VECTORDB_DIR))
-
-EMBED_MODEL = "nomic-embed-text"
-CHAT_MODEL = "llama3.2"
 
 
 def _collection(doc_id: str):
@@ -20,8 +18,7 @@ def _collection(doc_id: str):
 
 
 def embed_text(text: str) -> list[float]:
-    resp = ollama.embed(model=EMBED_MODEL, input=text)
-    return resp["embeddings"][0]
+    return _embed(text)
 
 
 def ingest_chunks(doc_id: str, chunks: list[dict]):
@@ -71,12 +68,7 @@ def query_document(doc_id: str, filename: str, question: str, n_results: int = 5
         f"Question: {question}\n\nAnswer:"
     )
 
-    response = ollama.chat(
-        model=CHAT_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    answer = response["message"]["content"]
-
+    answer = chat(prompt)
     return {"answer": answer, "citations": citations}
 
 
@@ -94,10 +86,6 @@ def extract_key_points(filename: str, chunks: list[dict], n_chunks: int = 10) ->
         f"Extract the 7 most important key points from this research paper excerpt. "
         f"Format as a numbered list. Be concise and specific.\n\n{text}"
     )
-    response = ollama.chat(
-        model=CHAT_MODEL,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    content = response["message"]["content"]
+    content = chat(prompt)
     lines = [l.strip() for l in content.split("\n") if l.strip()]
     return [l for l in lines if l[0].isdigit() or l.startswith("-")]

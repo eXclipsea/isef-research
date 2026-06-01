@@ -23,13 +23,18 @@ FRONTEND_DIST = BASE_DIR.parent / "frontend" / "dist"
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    for model in ["llama3.2", "nomic-embed-text"]:
-        try:
-            ollama.show(model)
-        except Exception:
-            print(f"Pulling {model}…")
-            ollama.pull(model)
-            print(f"{model} ready.")
+    # Best-effort model check — never block startup if Ollama is down.
+    try:
+        for model in ["llama3.2", "nomic-embed-text"]:
+            try:
+                ollama.show(model)
+            except Exception:
+                print(f"Pulling {model}…")
+                ollama.pull(model)
+                print(f"{model} ready.")
+    except Exception as e:
+        print(f"[warn] Ollama not reachable at startup ({e}). "
+              f"Notes & search still work; AI features need `ollama serve`.")
     yield
 
 

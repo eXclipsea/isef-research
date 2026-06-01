@@ -1,18 +1,16 @@
 import type { Document, RAGAnswer } from '../types'
+import { jsonOrThrow } from './http'
 
 const BASE = '/api/documents'
 
 export async function listDocuments(): Promise<Document[]> {
-  const r = await fetch(BASE)
-  return r.json()
+  return jsonOrThrow(await fetch(BASE))
 }
 
 export async function uploadDocument(file: File): Promise<Document> {
   const form = new FormData()
   form.append('file', file)
-  const r = await fetch(`${BASE}/upload`, { method: 'POST', body: form })
-  if (!r.ok) throw new Error(await r.text())
-  return r.json()
+  return jsonOrThrow(await fetch(`${BASE}/upload`, { method: 'POST', body: form }))
 }
 
 export async function deleteDocument(id: string): Promise<void> {
@@ -20,17 +18,15 @@ export async function deleteDocument(id: string): Promise<void> {
 }
 
 export async function queryDocument(id: string, question: string): Promise<RAGAnswer> {
-  const r = await fetch(`${BASE}/${id}/query`, {
+  return jsonOrThrow(await fetch(`${BASE}/${id}/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question }),
-  })
-  return r.json()
+  }))
 }
 
 export async function getKeyPoints(id: string): Promise<string[]> {
-  const r = await fetch(`${BASE}/${id}/keypoints`)
-  const data = await r.json()
+  const data = await jsonOrThrow<{ keypoints: string[] }>(await fetch(`${BASE}/${id}/keypoints`))
   return data.keypoints
 }
 
