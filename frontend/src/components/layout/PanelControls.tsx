@@ -20,16 +20,17 @@ export function PanelControls() {
             onClick={() => togglePanel(id)}
             style={{
               padding: '3px 12px',
-              borderRadius: '2px',
+              borderRadius: '5px',
               fontSize: '13px',
-              fontFamily: 'var(--font-serif)',
-              border: '1px solid transparent',
+              fontFamily: 'var(--font-ui)',
+              border: 'none',
               background: active ? 'var(--bg-surface)' : 'transparent',
               color: active ? 'var(--text-primary)' : 'var(--text-muted)',
               cursor: 'pointer',
-              borderColor: active ? 'var(--border)' : 'transparent',
-              letterSpacing: '0.01em',
+              transition: 'background 0.1s, color 0.1s',
             }}
+            onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)' }}
+            onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}
           >
             {label}
           </button>

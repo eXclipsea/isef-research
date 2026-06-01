@@ -46,7 +46,7 @@ export function RAGChat({ docId }: Props) {
         <button
           onClick={handleKeyPoints}
           disabled={loadingKP}
-          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-serif)', textDecoration: 'underline' }}
+          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)', textDecoration: 'underline' }}
         >
           {loadingKP ? 'Extracting…' : 'Extract key points'}
         </button>
@@ -56,26 +56,26 @@ export function RAGChat({ docId }: Props) {
       <div style={{ flex: 1, overflowY: 'auto', padding: '14px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         {keypoints && (
           <div style={{ borderLeft: '2px solid var(--border)', paddingLeft: '12px' }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Key Points</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Key Points</div>
             {keypoints.map((kp, i) => (
-              <div key={i} style={{ fontSize: '13px', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', padding: '2px 0', lineHeight: '1.6' }}>{kp}</div>
+              <div key={i} style={{ fontSize: '13px', color: 'var(--text-primary)', fontFamily: 'var(--font-ui)', padding: '2px 0', lineHeight: '1.6' }}>{kp}</div>
             ))}
           </div>
         )}
 
         {messages.map((msg, i) => (
           <div key={i} style={{ display: 'flex', gap: '10px' }}>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', flexShrink: 0, paddingTop: '2px', minWidth: '28px' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', flexShrink: 0, paddingTop: '2px', minWidth: '28px' }}>
               {msg.role === 'user' ? 'you' : 'ai'}
             </span>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', lineHeight: '1.65' }}>
+              <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontFamily: 'var(--font-ui)', lineHeight: '1.65' }}>
                 {msg.role === 'assistant' ? <ReactMarkdown>{msg.content}</ReactMarkdown> : msg.content}
               </div>
               {msg.citations && msg.citations.length > 0 && (
                 <div style={{ marginTop: '6px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                   {msg.citations.map((c, ci) => (
-                    <span key={ci} style={{ fontSize: '10px', fontFamily: 'var(--font-serif)', color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '1px 6px', borderRadius: '2px' }}>
+                    <span key={ci} style={{ fontSize: '10px', fontFamily: 'var(--font-ui)', color: 'var(--text-muted)', border: '1px solid var(--border)', padding: '1px 6px', borderRadius: '2px' }}>
                       {c.tag} {c.filename} p.{c.page}
                     </span>
                   ))}
@@ -87,13 +87,13 @@ export function RAGChat({ docId }: Props) {
 
         {loading && (
           <div style={{ display: 'flex', gap: '10px' }}>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', minWidth: '28px' }}>ai</span>
-            <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>Thinking…</span>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', minWidth: '28px' }}>ai</span>
+            <span style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Thinking…</span>
           </div>
         )}
 
         {messages.length === 0 && !keypoints && (
-          <div style={{ color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+          <div style={{ color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
             Ask anything about this document
           </div>
         )}
@@ -112,7 +112,7 @@ export function RAGChat({ docId }: Props) {
             borderRadius: '2px',
             color: 'var(--text-primary)',
             fontSize: '13px',
-            fontFamily: 'var(--font-serif)',
+            fontFamily: 'var(--font-ui)',
             outline: 'none',
           }}
         />
@@ -125,7 +125,7 @@ export function RAGChat({ docId }: Props) {
             border: 'none', borderRadius: '2px',
             color: 'var(--bg-base)',
             cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-            fontSize: '13px', fontFamily: 'var(--font-serif)', fontWeight: 700,
+            fontSize: '13px', fontFamily: 'var(--font-ui)', fontWeight: 700,
           }}
         >
           Ask

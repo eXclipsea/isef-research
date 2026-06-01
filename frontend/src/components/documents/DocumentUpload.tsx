@@ -45,16 +45,16 @@ export function DocumentUpload({ onUploaded }: Props) {
     >
       <input ref={inputRef} type="file" accept=".pdf" style={{ display: 'none' }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }} />
       {loading ? (
-        <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+        <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
           Processing PDF & building index…
         </div>
       ) : (
         <>
           <div style={{ fontSize: '22px', color: 'var(--text-muted)', lineHeight: 1 }}>↑</div>
-          <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)' }}>
+          <div style={{ fontSize: '13px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
             Drop PDF here or click to upload
           </div>
-          {error && <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-serif)' }}>{error}</div>}
+          {error && <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-ui)' }}>{error}</div>}
         </>
       )}
     </div>

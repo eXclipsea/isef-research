@@ -39,7 +39,7 @@ export function TabBar() {
           >
             <span style={{
               fontSize: '12px',
-              fontFamily: 'var(--font-serif)',
+              fontFamily: 'var(--font-ui)',
               color: active ? 'var(--text-primary)' : 'var(--text-muted)',
               overflow: 'hidden',
               whiteSpace: 'nowrap',
@@ -73,7 +73,7 @@ export function TabBar() {
       >
         <span style={{
           fontSize: '12px',
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-ui)',
           color: view === 'mindmap' ? 'var(--text-primary)' : 'var(--text-muted)',
         }}>
           ⬡ Mind Map

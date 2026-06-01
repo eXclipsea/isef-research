@@ -7,19 +7,19 @@ export default function App() {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        padding: '0 16px',
-        height: '40px',
+        padding: '0 14px',
+        height: '38px',
         borderBottom: '1px solid var(--border)',
-        background: 'var(--bg-panel)',
+        background: 'var(--bg-rail)',
         flexShrink: 0,
-        gap: '16px',
+        gap: '14px',
       }}>
         <span style={{
-          fontSize: '16px',
-          fontWeight: 700,
-          color: 'var(--text-primary)',
-          fontFamily: 'var(--font-serif)',
-          letterSpacing: '0.02em',
+          fontSize: '13px',
+          fontWeight: 600,
+          color: 'var(--text-secondary)',
+          fontFamily: 'var(--font-ui)',
+          letterSpacing: '0.01em',
         }}>
           ResearchOS
         </span>

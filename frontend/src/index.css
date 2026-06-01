@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --bg-base: #000000;
-  --bg-panel: #0d0d0d;
-  --bg-surface: #141414;
-  --bg-hover: #1c1c1c;
-  --border: #2a2a2a;
-  --border-light: #1f1f1f;
-  --text-primary: #f0f0f0;
-  --text-secondary: #b0b0b0;
-  --text-muted: #666666;
-  --accent: #ffffff;
-  --accent-light: #e0e0e0;
-  --green: #b0b0b0;
-  --red: #cccccc;
-  --yellow: #cccccc;
-  --blue: #cccccc;
-  --font-serif: "Times New Roman", Times, Georgia, serif;
-  --font-mono: "Courier New", Courier, monospace;
+  /* Obsidian default dark theme palette */
+  --bg-base: #1e1e1e;        /* editor background */
+  --bg-panel: #262626;       /* sidebars */
+  --bg-surface: #2a2a2a;     /* inputs, raised */
+  --bg-hover: #2f2f2f;
+  --bg-rail: #1a1a1a;        /* icon rail / titlebar */
+  --border: #363636;
+  --border-light: #2b2b2b;
+  --text-primary: #dadada;   /* normal text */
+  --text-secondary: #b3b3b3;
+  --text-muted: #888888;
+  --text-faint: #666666;
+  --accent: #a78bfa;         /* Obsidian purple */
+  --accent-light: #b9a6fb;
+  --accent-deep: #7c6cde;
+  --green: #4ec98f;
+  --red: #e0616f;
+  --yellow: #e0b341;
+  --blue: #5b9bd5;
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', 'JetBrains Mono', Menlo, Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -28,24 +32,71 @@ html, body, #root {
   padding: 0;
   background: var(--bg-base);
   color: var(--text-primary);
-  font-family: var(--font-serif);
-  font-size: 15px;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::selection {
-  background: rgba(255,255,255,0.15);
-}
+::selection { background: rgba(167, 139, 250, 0.28); }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #444; }
-
-input, button, select, textarea {
-  font-family: var(--font-serif);
+::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 6px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
 }
+::-webkit-scrollbar-thumb:hover { background: #4a4a4a; background-clip: padding-box; }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+input, button, select, textarea { font-family: var(--font-ui); }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ===== CodeMirror Live Preview (Obsidian-style) ===== */
+.cm-editor { height: 100%; background: transparent; }
+.cm-editor.cm-focused { outline: none; }
+.cm-scroller {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow: auto;
 }
+.cm-content { padding: 8px 0 40vh; max-width: 100%; caret-color: var(--accent); }
+.cm-line { padding: 0 48px; }
+.cm-gutters { display: none !important; }
+.cm-activeLine { background: transparent; }
+.cm-cursor, .cm-dropCursor { border-left-color: var(--accent) !important; border-left-width: 2px; }
+.cm-selectionBackground,
+.cm-focused .cm-selectionBackground,
+.cm-editor ::selection { background: rgba(167, 139, 250, 0.25) !important; }
+
+/* live-preview formatting */
+.cm-md-h1 { font-size: 1.9em; font-weight: 800; line-height: 1.25; color: #e8e8e8; }
+.cm-md-h2 { font-size: 1.55em; font-weight: 700; line-height: 1.3; color: #e6e6e6; }
+.cm-md-h3 { font-size: 1.3em;  font-weight: 700; color: #e2e2e2; }
+.cm-md-h4 { font-size: 1.12em; font-weight: 700; color: #dedede; }
+.cm-md-h5 { font-size: 1.02em; font-weight: 700; color: #d6d6d6; }
+.cm-md-h6 { font-size: 0.95em; font-weight: 700; color: var(--text-muted); }
+.cm-md-strong { font-weight: 700; color: #f0f0f0; }
+.cm-md-em { font-style: italic; }
+.cm-md-strike { text-decoration: line-through; color: var(--text-muted); }
+.cm-md-code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: #2d2d2d;
+  color: #d6b3ff;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.cm-md-quote { color: var(--text-secondary); font-style: italic; }
+.cm-md-link { color: var(--accent-light); text-decoration: underline; cursor: pointer; }
+.cm-md-bullet { color: var(--accent); }
+
+/* render-pane markdown (search summaries, etc.) */
+.prose-md p { margin: 0 0 0.7em; }
+.prose-md h1, .prose-md h2, .prose-md h3 { color: var(--text-primary); margin: 0.6em 0 0.3em; }
+.prose-md ul, .prose-md ol { margin: 0.3em 0 0.7em 1.2em; }
+.prose-md code { font-family: var(--font-mono); font-size: 0.88em; background: #2d2d2d; padding: 0.1em 0.35em; border-radius: 4px; color: #d6b3ff; }
+.prose-md a { color: var(--accent-light); }

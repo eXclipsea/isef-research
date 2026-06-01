@@ -52,7 +52,7 @@ export function NotesSidebar({ onRefresh: _onRefresh }: Props) {
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
-        <span style={{ fontSize: '11px', fontFamily: 'var(--font-serif)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <span style={{ fontSize: '11px', fontFamily: 'var(--font-ui)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           Notes
         </span>
         <button
@@ -78,7 +78,7 @@ export function NotesSidebar({ onRefresh: _onRefresh }: Props) {
             borderRadius: '2px',
             color: 'var(--text-primary)',
             fontSize: '13px',
-            fontFamily: 'var(--font-serif)',
+            fontFamily: 'var(--font-ui)',
             outline: 'none',
           }}
         />
@@ -93,7 +93,7 @@ export function NotesSidebar({ onRefresh: _onRefresh }: Props) {
               onClick={() => setActiveTag(activeTag === tag ? null : tag)}
               style={{
                 padding: '1px 7px', borderRadius: '2px', fontSize: '11px',
-                fontFamily: 'var(--font-serif)',
+                fontFamily: 'var(--font-ui)',
                 background: activeTag === tag ? 'var(--bg-surface)' : 'transparent',
                 border: '1px solid var(--border)',
                 color: activeTag === tag ? 'var(--text-primary)' : 'var(--text-muted)',
@@ -124,7 +124,7 @@ export function NotesSidebar({ onRefresh: _onRefresh }: Props) {
               border: '1px solid var(--text-muted)',
               borderRadius: '2px',
               color: 'var(--text-primary)', fontSize: '13px',
-              fontFamily: 'var(--font-serif)', outline: 'none',
+              fontFamily: 'var(--font-ui)', outline: 'none',
             }}
           />
         </div>
@@ -146,17 +146,17 @@ export function NotesSidebar({ onRefresh: _onRefresh }: Props) {
             onMouseEnter={(e) => { if (activeTabId !== note.id) (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-hover)' }}
             onMouseLeave={(e) => { if (activeTabId !== note.id) (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
           >
-            <div style={{ fontSize: '13px', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', marginBottom: '2px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: '13px', fontFamily: 'var(--font-ui)', color: 'var(--text-primary)', marginBottom: '2px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
               {note.title}
             </div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
               {new Date(note.updated_at).toLocaleDateString()}
               {note.tags.length > 0 && ` · ${note.tags.map(t => '#' + t).join(' ')}`}
             </div>
           </div>
         ))}
         {displayed.length === 0 && (
-          <div style={{ padding: '20px 14px', color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+          <div style={{ padding: '20px 14px', color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
             No notes
           </div>
         )}

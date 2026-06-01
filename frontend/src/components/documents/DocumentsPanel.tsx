@@ -28,11 +28,11 @@ export function DocumentsPanel() {
         <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--border)', background: 'var(--bg-panel)', flexShrink: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             onClick={() => setSelectedDoc(null)}
-            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px', fontFamily: 'var(--font-serif)', padding: 0 }}
+            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px', fontFamily: 'var(--font-ui)', padding: 0 }}
           >
             ← back
           </button>
-          <span style={{ flex: 1, fontSize: '13px', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+          <span style={{ flex: 1, fontSize: '13px', fontFamily: 'var(--font-ui)', color: 'var(--text-primary)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
             {selectedDoc.filename}
           </span>
           {(['pdf', 'chat'] as const).map((v) => (
@@ -42,7 +42,7 @@ export function DocumentsPanel() {
               style={{
                 background: 'none', border: 'none',
                 padding: '0 0 1px',
-                fontSize: '12px', fontFamily: 'var(--font-serif)',
+                fontSize: '12px', fontFamily: 'var(--font-ui)',
                 color: view === v ? 'var(--text-primary)' : 'var(--text-muted)',
                 cursor: 'pointer', textTransform: 'uppercase',
                 borderBottom: `1px solid ${view === v ? 'var(--text-primary)' : 'transparent'}`,
@@ -69,7 +69,7 @@ export function DocumentsPanel() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: 'var(--bg-base)' }}>
       <div style={{ padding: '10px 14px 8px', borderBottom: '1px solid var(--border)', background: 'var(--bg-panel)', flexShrink: 0 }}>
-        <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           Research Documents
         </span>
       </div>
@@ -78,7 +78,7 @@ export function DocumentsPanel() {
 
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {docs.length === 0 ? (
-          <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px 14px', fontSize: '13px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+          <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px 14px', fontSize: '13px', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
             No documents yet
           </div>
         ) : (
@@ -92,16 +92,16 @@ export function DocumentsPanel() {
             >
               <span style={{ fontSize: '13px', color: 'var(--text-muted)', flexShrink: 0 }}>PDF</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '13px', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: '13px', fontFamily: 'var(--font-ui)', color: 'var(--text-primary)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
                   {doc.filename}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
                   {doc.chunk_count} chunks · {new Date(doc.created_at).toLocaleDateString()}
                 </div>
               </div>
               <button
                 onClick={(e) => handleDelete(doc, e)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-serif)' }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)' }}
               >
                 ×
               </button>

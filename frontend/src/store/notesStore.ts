@@ -8,6 +8,8 @@ interface NotesState {
   openTabs: string[]          // note ids open as tabs
   activeTabId: string | null  // focused tab
   view: NotesView
+  stats: { words: number; chars: number }
+  setStats: (words: number, chars: number) => void
   setNotes: (notes: Note[]) => void
   openTab: (id: string) => void
   closeTab: (id: string) => void
@@ -22,6 +24,8 @@ export const useNotesStore = create<NotesState>((set) => ({
   openTabs: [],
   activeTabId: null,
   view: 'editor',
+  stats: { words: 0, chars: 0 },
+  setStats: (words, chars) => set({ stats: { words, chars } }),
   setNotes: (notes) => set({ notes }),
   setView: (view) => set({ view }),
   openTab: (id) =>

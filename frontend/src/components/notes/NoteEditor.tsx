@@ -5,42 +5,25 @@ import { markdown } from '@codemirror/lang-markdown'
 import type { Note } from '../../types'
 import { updateNote, deleteNote } from '../../api/notes'
 import { useNotesStore } from '../../store/notesStore'
+import { livePreview } from './livePreview'
 
 interface Props {
   note: Note
 }
 
-const obsidianTheme = EditorView.theme({
-  '&': { height: '100%', background: 'transparent' },
-  '.cm-scroller': {
-    fontFamily: '"Times New Roman", Times, Georgia, serif',
-    fontSize: '15px',
-    lineHeight: '1.7',
-    overflow: 'auto',
-  },
-  '.cm-content': { padding: '24px 32px', caretColor: '#fff' },
-  '.cm-focused': { outline: 'none' },
-  '.cm-line': { padding: '0' },
-  '&.cm-focused .cm-cursor': { borderLeftColor: '#fff' },
-  '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
-    background: 'rgba(255,255,255,0.1) !important',
-  },
-  '.cm-gutters': { display: 'none' },
-  '.cm-activeLine': { background: 'rgba(255,255,255,0.03)' },
-  // markdown heading styles
-  '.cm-header-1': { fontSize: '1.6em', fontWeight: 'bold', color: '#fff' },
-  '.cm-header-2': { fontSize: '1.3em', fontWeight: 'bold', color: '#e0e0e0' },
-  '.cm-header-3': { fontSize: '1.1em', fontWeight: 'bold', color: '#ccc' },
-  '.cm-strong': { color: '#fff', fontWeight: 'bold' },
-  '.cm-em': { color: '#ccc', fontStyle: 'italic' },
-  '.cm-link': { color: '#aaa', textDecoration: 'underline' },
-  '.cm-url': { color: '#888' },
+function countStats(text: string) {
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0
+  return { words, chars: text.length }
+}
+
+const editorTheme = EditorView.theme({
+  '&': { height: '100%', background: 'transparent', color: 'var(--text-primary)' },
 })
 
 export function NoteEditor({ note }: Props) {
   const editorRef = useRef<HTMLDivElement>(null)
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const { upsertNote, removeNote } = useNotesStore()
+  const { upsertNote, removeNote, setStats } = useNotesStore()
   const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState(note.tags)
   const [saved, setSaved] = useState(true)
@@ -62,17 +45,26 @@ export function NoteEditor({ note }: Props) {
 
   useEffect(() => {
     if (!editorRef.current) return
+    const initial = note.content || ''
+    const s = countStats(initial)
+    setStats(s.words, s.chars)
+
     const state = EditorState.create({
-      doc: note.content || '',
+      doc: initial,
       extensions: [
         basicSetup,
         markdown(),
-        obsidianTheme,
-        EditorView.updateListener.of((update: { docChanged: boolean; state: { doc: { toString(): string } } }) => {
+        livePreview,
+        editorTheme,
+        EditorView.lineWrapping,
+        EditorView.updateListener.of((update) => {
           if (update.docChanged) {
+            const text = update.state.doc.toString()
+            const st = countStats(text)
+            setStats(st.words, st.chars)
             setSaved(false)
             if (saveTimeout.current) clearTimeout(saveTimeout.current)
-            saveTimeout.current = setTimeout(() => save(update.state.doc.toString()), 700)
+            saveTimeout.current = setTimeout(() => save(text), 700)
           }
         }),
       ],
@@ -115,72 +107,56 @@ export function NoteEditor({ note }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      {/* title bar */}
-      <div style={{
-        padding: '10px 32px 6px',
-        borderBottom: '1px solid var(--border-light)',
-        background: 'var(--bg-base)',
-        flexShrink: 0,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-      }}>
+      {/* inline title (Obsidian renders the filename as the H1) */}
+      <div style={{ padding: '20px 48px 4px', flexShrink: 0 }}>
         <input
           value={titleVal}
           onChange={(e) => setTitleVal(e.target.value)}
           onBlur={handleTitleBlur}
+          placeholder="Untitled"
           style={{
-            flex: 1,
-            background: 'none', border: 'none', outline: 'none',
-            color: 'var(--text-primary)',
-            fontSize: '20px',
-            fontWeight: 700,
-            fontFamily: 'var(--font-serif)',
+            width: '100%', background: 'none', border: 'none', outline: 'none',
+            color: 'var(--text-primary)', fontSize: '1.9em', fontWeight: 800,
+            fontFamily: 'var(--font-ui)', letterSpacing: '-0.01em', lineHeight: 1.25,
           }}
         />
-        <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)' }}>
-          {saved ? 'saved' : 'saving…'}
-        </span>
-        <button
-          onClick={handleDelete}
-          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '13px', fontFamily: 'var(--font-serif)' }}
-        >
-          delete
-        </button>
-      </div>
-
-      {/* tags */}
-      <div style={{
-        padding: '5px 32px',
-        display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px',
-        borderBottom: '1px solid var(--border-light)',
-        background: 'var(--bg-base)',
-        flexShrink: 0,
-        minHeight: '30px',
-      }}>
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            onClick={() => handleRemoveTag(tag)}
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              onClick={() => handleRemoveTag(tag)}
+              style={{
+                fontSize: '12px', fontFamily: 'var(--font-ui)',
+                color: 'var(--accent-light)', background: 'rgba(167,139,250,0.12)',
+                padding: '1px 8px', borderRadius: '10px', cursor: 'pointer',
+              }}
+              title="click to remove"
+            >
+              #{tag}
+            </span>
+          ))}
+          <input
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleAddTag}
+            placeholder={tags.length === 0 ? 'add tag…' : '+'}
             style={{
-              fontSize: '12px', fontFamily: 'var(--font-serif)',
-              color: 'var(--text-muted)', cursor: 'pointer',
+              background: 'none', border: 'none', outline: 'none',
+              color: 'var(--text-muted)', fontSize: '12px',
+              fontFamily: 'var(--font-ui)', width: tags.length === 0 ? '70px' : '24px',
             }}
-          >
-            #{tag} ×
+          />
+          <div style={{ flex: 1 }} />
+          <span style={{ fontSize: '11px', color: 'var(--text-faint)', fontFamily: 'var(--font-ui)' }}>
+            {saved ? '' : 'saving…'}
           </span>
-        ))}
-        <input
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          onKeyDown={handleAddTag}
-          placeholder={tags.length === 0 ? 'add tag…' : ''}
-          style={{
-            background: 'none', border: 'none', outline: 'none',
-            color: 'var(--text-muted)', fontSize: '12px',
-            fontFamily: 'var(--font-serif)', width: '80px',
-          }}
-        />
+          <button
+            onClick={handleDelete}
+            style={{ background: 'none', border: 'none', color: 'var(--text-faint)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)' }}
+          >
+            delete
+          </button>
+        </div>
       </div>
 
       {/* editor */}

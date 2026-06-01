@@ -55,19 +55,19 @@ export function SourceCard({ source, index, selected, onToggle }: Props) {
             style={{ marginTop: '3px', flexShrink: 0, accentColor: '#fff', cursor: 'pointer' }}
           />
         )}
-        <span style={{ flexShrink: 0, fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', paddingTop: '2px', minWidth: '20px' }}>
+        <span style={{ flexShrink: 0, fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', paddingTop: '2px', minWidth: '20px' }}>
           [{index}]
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <a
             href={source.url} target="_blank" rel="noreferrer"
-            style={{ fontSize: '14px', fontFamily: 'var(--font-serif)', color: 'var(--text-primary)', textDecoration: 'underline', textDecorationColor: 'var(--border)', display: 'block', marginBottom: '2px' }}
+            style={{ fontSize: '14px', fontFamily: 'var(--font-ui)', color: 'var(--text-primary)', textDecoration: 'underline', textDecorationColor: 'var(--border)', display: 'block', marginBottom: '2px' }}
           >
             {source.title}
           </a>
 
           {paper && (
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', marginBottom: '3px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', marginBottom: '3px' }}>
               {paper.authors.slice(0, 3).join(', ')}{paper.authors.length > 3 ? ' et al.' : ''}
               {paper.year && ` · ${paper.year}`}
               {` · ${paper.source}`}
@@ -75,18 +75,18 @@ export function SourceCard({ source, index, selected, onToggle }: Props) {
           )}
 
           {!paper && (
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', marginBottom: '3px' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', marginBottom: '3px' }}>
               {source.url}
             </div>
           )}
 
           {snippet && (
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'var(--font-serif)', lineHeight: '1.5' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'var(--font-ui)', lineHeight: '1.5' }}>
               {expanded ? snippet : snippet.slice(0, 180) + (snippet.length > 180 ? '…' : '')}
               {snippet.length > 180 && (
                 <button
                   onClick={() => setExpanded(!expanded)}
-                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-serif)', marginLeft: '4px', padding: 0 }}
+                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)', marginLeft: '4px', padding: 0 }}
                 >
                   {expanded ? 'less' : 'more'}
                 </button>
@@ -95,11 +95,11 @@ export function SourceCard({ source, index, selected, onToggle }: Props) {
           )}
 
           {citation && (
-            <div style={{ marginTop: '8px', padding: '8px 12px', background: 'var(--bg-surface)', borderLeft: '2px solid var(--border)', fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-serif)', fontStyle: 'italic', lineHeight: '1.5' }}>
+            <div style={{ marginTop: '8px', padding: '8px 12px', background: 'var(--bg-surface)', borderLeft: '2px solid var(--border)', fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-ui)', fontStyle: 'italic', lineHeight: '1.5' }}>
               {citation}
               <button
                 onClick={() => { navigator.clipboard.writeText(citation); setCopied(true); setTimeout(() => setCopied(false), 1500) }}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '11px', fontFamily: 'var(--font-serif)', marginLeft: '8px' }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '11px', fontFamily: 'var(--font-ui)', marginLeft: '8px' }}
               >
                 {copied ? 'copied' : 'copy'}
               </button>
@@ -109,12 +109,12 @@ export function SourceCard({ source, index, selected, onToggle }: Props) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end', flexShrink: 0 }}>
           {paper && (paper.doi || paper.pdf_url) && (
-            <button onClick={handleCitation} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '11px', fontFamily: 'var(--font-serif)' }}>
+            <button onClick={handleCitation} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '11px', fontFamily: 'var(--font-ui)' }}>
               cite
             </button>
           )}
           {paper && (paper.pdf_url || paper.doi) && (
-            <button onClick={openPdf} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '11px', fontFamily: 'var(--font-serif)' }}>
+            <button onClick={openPdf} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '11px', fontFamily: 'var(--font-ui)' }}>
               pdf
             </button>
           )}

@@ -31,18 +31,18 @@ export function SearchSummary({ summary, query }: Props) {
       marginBottom: '8px',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-        <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-serif)' }}>
+        <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-ui)' }}>
           AI Summary
         </span>
         <div style={{ flex: 1 }} />
-        <button onClick={handleCopy} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-serif)' }}>
+        <button onClick={handleCopy} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)' }}>
           {copied ? 'copied' : 'copy'}
         </button>
-        <button onClick={handleSaveToNote} disabled={saving} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-serif)' }}>
+        <button onClick={handleSaveToNote} disabled={saving} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)' }}>
           {saving ? 'saving…' : 'save to note'}
         </button>
       </div>
-      <div style={{ fontSize: '14px', lineHeight: '1.75', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)' }}>
+      <div className="prose-md" style={{ fontSize: '15px', lineHeight: '1.65', color: 'var(--text-primary)', fontFamily: 'var(--font-ui)' }}>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
       </div>
     </div>

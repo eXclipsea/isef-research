@@ -85,7 +85,7 @@ export function SearchPanel() {
                 flex: 1, padding: '8px 12px', background: 'var(--bg-base)',
                 border: '1px solid var(--border)', borderRadius: '2px',
                 color: 'var(--text-primary)', fontSize: '14px',
-                fontFamily: 'var(--font-serif)', outline: 'none',
+                fontFamily: 'var(--font-ui)', outline: 'none',
               }}
             />
             <button
@@ -95,7 +95,7 @@ export function SearchPanel() {
                 padding: '8px 18px',
                 background: status === 'loading' ? 'var(--bg-surface)' : 'var(--text-primary)',
                 border: 'none', borderRadius: '2px', color: 'var(--bg-base)',
-                fontSize: '14px', fontFamily: 'var(--font-serif)',
+                fontSize: '14px', fontFamily: 'var(--font-ui)',
                 cursor: status === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 700,
               }}
             >
@@ -110,7 +110,7 @@ export function SearchPanel() {
                 onClick={() => setMode(m)}
                 style={{
                   background: 'none', border: 'none', padding: '0 0 2px',
-                  fontSize: '12px', fontFamily: 'var(--font-serif)',
+                  fontSize: '12px', fontFamily: 'var(--font-ui)',
                   color: mode === m ? 'var(--text-primary)' : 'var(--text-muted)',
                   cursor: 'pointer',
                   borderBottom: `1px solid ${mode === m ? 'var(--text-primary)' : 'transparent'}`,
@@ -133,14 +133,14 @@ export function SearchPanel() {
               border: '2px solid var(--border)', borderTopColor: 'var(--text-primary)',
               borderRadius: '50%', animation: 'spin 0.8s linear infinite',
             }} />
-            <div style={{ color: 'var(--text-muted)', fontSize: '14px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+            <div style={{ color: 'var(--text-muted)', fontSize: '14px', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
               Searching sources & synthesising…
             </div>
           </div>
         )}
 
         {status === 'idle' && (
-          <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '80px 0', fontSize: '14px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+          <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '80px 0', fontSize: '14px', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
             Enter a query to search
           </div>
         )}
@@ -153,28 +153,28 @@ export function SearchPanel() {
             {(topicsLoading || topics) && (
               <div style={{ marginTop: '20px', borderLeft: '2px solid var(--text-primary)', paddingLeft: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-serif)' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-ui)' }}>
                     Key Topics
                   </span>
                   {topics && (
-                    <button onClick={saveTopicsToNote} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-serif)' }}>
+                    <button onClick={saveTopicsToNote} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)' }}>
                       save to note
                     </button>
                   )}
                 </div>
                 {topicsLoading ? (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '13px', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
                     Reading {selected.size} sources & extracting topics…
                   </div>
                 ) : topics && (
                   <>
                     {topics.overview && (
-                      <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontFamily: 'var(--font-serif)', lineHeight: 1.6, marginBottom: '10px' }}>
+                      <div style={{ fontSize: '14px', color: 'var(--text-primary)', fontFamily: 'var(--font-ui)', lineHeight: 1.6, marginBottom: '10px' }}>
                         {topics.overview}
                       </div>
                     )}
                     {topics.topics.map((t, i) => (
-                      <div key={i} style={{ fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'var(--font-serif)', lineHeight: 1.6, padding: '2px 0' }}>
+                      <div key={i} style={{ fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'var(--font-ui)', lineHeight: 1.6, padding: '2px 0' }}>
                         — {t}
                       </div>
                     ))}
@@ -185,7 +185,7 @@ export function SearchPanel() {
 
             {result.paper_results.length > 0 && (
               <div style={{ marginTop: '24px' }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-serif)', marginBottom: '10px', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-ui)', marginBottom: '10px', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px' }}>
                   Papers — {result.paper_results.length}
                 </div>
                 {result.paper_results.map((p, i) => (
@@ -196,7 +196,7 @@ export function SearchPanel() {
 
             {result.web_results.length > 0 && (
               <div style={{ marginTop: '24px' }}>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-serif)', marginBottom: '10px', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-ui)', marginBottom: '10px', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px' }}>
                   Web — {result.web_results.length}
                 </div>
                 {result.web_results.map((w, i) => {
@@ -217,10 +217,10 @@ export function SearchPanel() {
           flexShrink: 0, borderTop: '1px solid var(--border)', background: 'var(--bg-panel)',
           padding: '10px 16px', display: 'flex', alignItems: 'center', gap: '12px',
         }}>
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
             {selected.size} source{selected.size === 1 ? '' : 's'} selected
           </span>
-          <button onClick={() => setSelected(new Set())} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-serif)' }}>
+          <button onClick={() => setSelected(new Set())} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)' }}>
             clear
           </button>
           <div style={{ flex: 1 }} />
@@ -231,7 +231,7 @@ export function SearchPanel() {
               padding: '7px 16px',
               background: topicsLoading ? 'var(--bg-surface)' : 'var(--text-primary)',
               border: 'none', borderRadius: '2px', color: 'var(--bg-base)',
-              fontSize: '13px', fontFamily: 'var(--font-serif)', fontWeight: 700,
+              fontSize: '13px', fontFamily: 'var(--font-ui)', fontWeight: 700,
               cursor: topicsLoading ? 'not-allowed' : 'pointer',
             }}
           >

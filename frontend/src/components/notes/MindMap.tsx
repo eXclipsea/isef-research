@@ -70,7 +70,7 @@ function NodeView({ node, depth }: { node: TreeNode; depth: number }) {
           fontWeight,
           color,
           fontStyle,
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-ui)',
           lineHeight: 1.4,
           borderBottom: isRoot ? '1px solid var(--border)' : 'none',
           paddingBottom: isRoot ? '4px' : 0,
@@ -99,7 +99,7 @@ export function MindMap() {
 
   if (openNotes.length === 0) {
     return (
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: '14px' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', fontStyle: 'italic', fontSize: '14px' }}>
         Open some notes to see the mind map
       </div>
     )
@@ -107,7 +107,7 @@ export function MindMap() {
 
   return (
     <div style={{ flex: 1, overflow: 'auto', padding: '24px 32px', background: 'var(--bg-base)' }}>
-      <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '20px' }}>
+      <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '20px' }}>
         Mind Map — {openNotes.length} {openNotes.length === 1 ? 'tab' : 'tabs'}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

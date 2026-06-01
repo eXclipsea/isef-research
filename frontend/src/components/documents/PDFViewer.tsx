@@ -28,7 +28,7 @@ export function PDFViewer({ url }: Props) {
         >
           ‹
         </button>
-        <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)' }}>
+        <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
           {page} / {numPages || '?'}
         </span>
         <button
@@ -44,8 +44,8 @@ export function PDFViewer({ url }: Props) {
         <Document
           file={url}
           onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-          loading={<div style={{ color: 'var(--text-muted)', padding: '20px', fontSize: '13px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>Loading PDF…</div>}
-          error={<div style={{ color: 'var(--text-secondary)', padding: '20px', fontSize: '13px', fontFamily: 'var(--font-serif)' }}>Failed to load PDF</div>}
+          loading={<div style={{ color: 'var(--text-muted)', padding: '20px', fontSize: '13px', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Loading PDF…</div>}
+          error={<div style={{ color: 'var(--text-secondary)', padding: '20px', fontSize: '13px', fontFamily: 'var(--font-ui)' }}>Failed to load PDF</div>}
         >
           <Page pageNumber={page} width={500} renderTextLayer={true} renderAnnotationLayer={true} />
         </Document>

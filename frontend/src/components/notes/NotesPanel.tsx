@@ -6,6 +6,7 @@ import { NoteEditor } from './NoteEditor'
 import { BacklinksPanel } from './BacklinksPanel'
 import { TabBar } from './TabBar'
 import { MindMap } from './MindMap'
+import { StatusBar } from './StatusBar'
 
 export function NotesPanel() {
   const { notes, openTabs, activeTabId, view, setNotes, upsertNote } = useNotesStore()
@@ -30,29 +31,33 @@ export function NotesPanel() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'var(--bg-base)', minWidth: 0 }}>
         <TabBar />
 
-        {view === 'mindmap' ? (
-          <MindMap />
-        ) : activeNote && activeNote.content !== undefined ? (
-          <>
-            <NoteEditor key={activeNote.id} note={activeNote} />
-            <BacklinksPanel noteId={activeNote.id} />
-          </>
-        ) : activeNote ? (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
-            Loading…
-          </div>
-        ) : (
-          <div style={{
-            flex: 1, display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center',
-            color: 'var(--text-muted)', gap: '8px',
-          }}>
-            <div style={{ fontSize: '28px', lineHeight: 1 }}>✦</div>
-            <div style={{ fontSize: '14px', fontFamily: 'var(--font-serif)', fontStyle: 'italic' }}>
-              Select a note from the sidebar
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+          {view === 'mindmap' ? (
+            <MindMap />
+          ) : activeNote && activeNote.content !== undefined ? (
+            <>
+              <NoteEditor key={activeNote.id} note={activeNote} />
+              <BacklinksPanel noteId={activeNote.id} />
+            </>
+          ) : activeNote ? (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>
+              Loading…
             </div>
-          </div>
-        )}
+          ) : (
+            <div style={{
+              flex: 1, display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              color: 'var(--text-faint)', gap: '10px',
+            }}>
+              <div style={{ fontSize: '32px', lineHeight: 1, opacity: 0.5 }}>✦</div>
+              <div style={{ fontSize: '14px', fontFamily: 'var(--font-ui)' }}>
+                No note open — pick one from the sidebar or press +
+              </div>
+            </div>
+          )}
+        </div>
+
+        <StatusBar noteId={view === 'editor' && activeNote ? activeNote.id : null} />
       </div>
     </div>
   )
