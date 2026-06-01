@@ -20,6 +20,7 @@ backend/data/notes.db
 
 # Logs
 *.log
+app-launch.log
 
 # OS
 .DS_Store

@@ -2,6 +2,9 @@
 set -e
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 
+# Finder-launched apps get a minimal PATH — make sure our tools are found.
+export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.bun/bin:$PATH"
+
 echo ""
 echo "  ResearchOS — ISEF"
 echo "  ────────────────────────────────"
@@ -66,7 +69,15 @@ echo "  Logs:  backend/backend.log · searxng/searxng.log · ollama.log"
 echo "  Press Ctrl+C to stop."
 echo ""
 
-open "http://localhost:8000" 2>/dev/null || true
+if [ "${RESEARCHOS_APP_MODE:-0}" = "1" ] && [ -d "/Applications/Google Chrome.app" ]; then
+  # dedicated, chromeless app window (its own profile so it looks like a native app)
+  open -na "Google Chrome" --args \
+    --app="http://localhost:8000" \
+    --user-data-dir="$HOME/.researchos-window" \
+    --no-first-run --no-default-browser-check 2>/dev/null || open "http://localhost:8000"
+else
+  open "http://localhost:8000" 2>/dev/null || true
+fi
 
 cleanup() {
   echo "  Stopping…"

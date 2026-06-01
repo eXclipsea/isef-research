@@ -35,6 +35,12 @@ export async function deleteNote(id: string): Promise<void> {
   await fetch(`${BASE}/${id}`, { method: 'DELETE' })
 }
 
+export async function appendToNote(id: string, markdown: string): Promise<Note> {
+  const existing = await getNote(id)
+  const sep = (existing.content || '').trim() ? '\n\n---\n\n' : ''
+  return updateNote(id, { content: (existing.content || '') + sep + markdown })
+}
+
 export async function searchNotes(q: string): Promise<Note[]> {
   const r = await fetch(`${BASE}/search?q=${encodeURIComponent(q)}`)
   return r.json()

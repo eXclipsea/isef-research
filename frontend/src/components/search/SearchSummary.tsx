@@ -1,22 +1,12 @@
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { createNote } from '../../api/notes'
-import { useNotesStore } from '../../store/notesStore'
+import { SaveToNoteMenu } from '../notes/SaveToNoteMenu'
 
 interface Props { summary: string; query: string }
 
 export function SearchSummary({ summary, query }: Props) {
   const [copied, setCopied] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const { upsertNote } = useNotesStore()
-
-  async function handleSaveToNote() {
-    setSaving(true)
-    const note = await createNote({ title: query, content: `# ${query}\n\n${summary}`, tags: ['search'] })
-    upsertNote(note)
-    setSaving(false)
-  }
 
   function handleCopy() {
     navigator.clipboard.writeText(summary)
@@ -38,9 +28,11 @@ export function SearchSummary({ summary, query }: Props) {
         <button onClick={handleCopy} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)' }}>
           {copied ? 'copied' : 'copy'}
         </button>
-        <button onClick={handleSaveToNote} disabled={saving} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', fontFamily: 'var(--font-ui)' }}>
-          {saving ? 'saving…' : 'save to note'}
-        </button>
+        <SaveToNoteMenu
+          title={query}
+          tags={['search']}
+          getMarkdown={() => `# ${query}\n\n${summary}`}
+        />
       </div>
       <div className="prose-md" style={{ fontSize: '15px', lineHeight: '1.65', color: 'var(--text-primary)', fontFamily: 'var(--font-ui)' }}>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>

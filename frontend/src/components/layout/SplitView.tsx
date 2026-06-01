@@ -23,6 +23,7 @@ export function SplitView() {
         <PanelFrame
           key={id}
           id={id}
+          colIdx={colIdx}
           canStackLeft={colIdx > 0}
           canSplitOut={col.length > 1}
         >

@@ -1,21 +1,20 @@
 import { useEffect, useState } from 'react'
-import type { Document } from '../../types'
+import type { Document, TopicsResult } from '../../types'
 import { deleteDocument, getDocumentFileUrl, generateDocTopics } from '../../api/documents'
-import { createNote } from '../../api/notes'
 import { useDocumentsStore } from '../../store/documentsStore'
-import { useNotesStore } from '../../store/notesStore'
 import { DocumentUpload } from './DocumentUpload'
 import { PDFViewer } from './PDFViewer'
 import { RAGChat } from './RAGChat'
 import { CitationCard } from './CitationCard'
+import { SaveToNoteMenu } from '../notes/SaveToNoteMenu'
 
 export function DocumentsPanel() {
   const { docs, reload, addDocs, removeDoc } = useDocumentsStore()
-  const { openTab, upsertNote } = useNotesStore()
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null)
   const [view, setView] = useState<'pdf' | 'chat'>('pdf')
   const [picked, setPicked] = useState<Set<string>>(new Set())
   const [topicsBusy, setTopicsBusy] = useState(false)
+  const [topics, setTopics] = useState<TopicsResult | null>(null)
 
   useEffect(() => { reload() }, [])
 
@@ -37,19 +36,18 @@ export function DocumentsPanel() {
     const ids = picked.size > 0 ? [...picked] : docs.map((d) => d.id)
     if (ids.length === 0) return
     setTopicsBusy(true)
+    setTopics(null)
     try {
-      const res = await generateDocTopics(ids)
-      const md =
-        `# Key Topics\n\n${res.overview}\n\n` +
-        res.topics.map((t) => `- ${t}`).join('\n')
-      const note = await createNote({ title: 'Key Topics', content: md, tags: ['research'] })
-      upsertNote(note)
-      openTab(note.id)
+      setTopics(await generateDocTopics(ids))
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Could not generate key topics.')
     } finally {
       setTopicsBusy(false)
     }
+  }
+
+  function topicsMarkdown(t: TopicsResult): string {
+    return `# Key Topics\n\n${t.overview}\n\n${t.topics.map((x) => `- ${x}`).join('\n')}`
   }
 
   // ---- single-document view ----
@@ -165,22 +163,41 @@ export function DocumentsPanel() {
       </div>
 
       {docs.length > 0 && (
-        <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)', background: 'var(--bg-panel)', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
-            {picked.size > 0 ? `${picked.size} selected` : 'all documents'}
-          </span>
-          <div style={{ flex: 1 }} />
-          <button
-            onClick={generateTopicsNote}
-            disabled={topicsBusy}
-            style={{
-              padding: '7px 14px', background: topicsBusy ? 'var(--bg-surface)' : 'var(--accent)',
-              border: 'none', borderRadius: '2px', color: '#fff', fontSize: '13px',
-              fontFamily: 'var(--font-ui)', fontWeight: 600, cursor: topicsBusy ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {topicsBusy ? 'Generating…' : 'Generate key topics → note'}
-          </button>
+        <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          {topics && (
+            <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border-light)', maxHeight: '220px', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'var(--font-ui)', flex: 1 }}>
+                  Key Topics
+                </span>
+                <SaveToNoteMenu title="Key Topics" tags={['research']} getMarkdown={() => topicsMarkdown(topics)} />
+                <button onClick={() => setTopics(null)} style={{ background: 'none', border: 'none', color: 'var(--text-faint)', cursor: 'pointer', fontSize: '13px' }}>✕</button>
+              </div>
+              {topics.overview && (
+                <div style={{ fontSize: '13px', color: 'var(--text-primary)', fontFamily: 'var(--font-ui)', lineHeight: 1.6, marginBottom: '8px' }}>{topics.overview}</div>
+              )}
+              {topics.topics.map((t, i) => (
+                <div key={i} style={{ fontSize: '13px', color: 'var(--text-secondary)', fontFamily: 'var(--font-ui)', lineHeight: 1.6, padding: '1px 0' }}>— {t}</div>
+              ))}
+            </div>
+          )}
+          <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
+              {picked.size > 0 ? `${picked.size} selected` : 'all documents'}
+            </span>
+            <div style={{ flex: 1 }} />
+            <button
+              onClick={generateTopicsNote}
+              disabled={topicsBusy}
+              style={{
+                padding: '7px 14px', background: topicsBusy ? 'var(--bg-surface)' : 'var(--accent)',
+                border: 'none', borderRadius: '2px', color: '#fff', fontSize: '13px',
+                fontFamily: 'var(--font-ui)', fontWeight: 600, cursor: topicsBusy ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {topicsBusy ? 'Generating…' : 'Generate key topics'}
+            </button>
+          </div>
         </div>
       )}
     </div>

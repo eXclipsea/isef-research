@@ -8,13 +8,37 @@ A fully local AI research tool for ISEF. Replaces Perplexity, Anara, and Obsidia
 
 ## Quick Start
 
+**As an app (recommended):** double-click **ResearchOS.app**.
+It starts Ollama, the search engine, and the backend, then opens a
+dedicated window. (Build it once with `./build-app.sh` if it isn't there.)
+
+**From the terminal:**
+
 ```bash
 ./start.sh
 ```
 
 Opens at **http://localhost:8000** automatically.
 
-That's it. One command starts everything.
+That's it. One command starts everything (Ollama, SearXNG, backend).
+
+---
+
+## Layout
+
+Use the **Layout** menu (top-right) to arrange the three panels —
+three columns, two columns with one column stacked (e.g. Search over
+Research), and so on. You can also **drag a panel's title onto another
+panel to stack them**, and drag the dividers to resize. Each panel header
+has stack / split / close controls.
+
+## Notes
+
+- Markdown live-preview editor (Obsidian-style), word/character count.
+- Organise notes into **folders** — drag a note onto a folder, or use the
+  note's "⋯" menu to move / delete it.
+- "Save to note" anywhere lets you create a **new note** or **append to an
+  existing one**.
 
 ---
 

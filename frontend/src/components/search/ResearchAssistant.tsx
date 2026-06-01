@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { researchAssistant } from '../../api/search'
-import { createNote } from '../../api/notes'
-import { useNotesStore } from '../../store/notesStore'
+import { SaveToNoteMenu } from '../notes/SaveToNoteMenu'
 import type { ResearchPlan } from '../../types'
 
 interface Props {
@@ -13,7 +12,6 @@ export function ResearchAssistant({ onRunSearch }: Props) {
   const [loading, setLoading] = useState(false)
   const [plan, setPlan] = useState<ResearchPlan | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const { openTab, upsertNote } = useNotesStore()
 
   async function handlePlan() {
     if (!project.trim()) return
@@ -29,17 +27,14 @@ export function ResearchAssistant({ onRunSearch }: Props) {
     }
   }
 
-  async function savePlanToNote() {
-    if (!plan) return
-    const md =
-      `# Research Plan\n\n${plan.summary}\n\n` +
-      (plan.questions.length ? `## Research Questions\n${plan.questions.map((q) => `- ${q}`).join('\n')}\n\n` : '') +
-      (plan.subtopics.length ? `## Key Subtopics\n${plan.subtopics.map((s) => `- ${s}`).join('\n')}\n\n` : '') +
-      (plan.searches.length ? `## Searches to Run\n${plan.searches.map((s) => `- ${s}`).join('\n')}\n\n` : '') +
-      (plan.outline.length ? `## Outline\n${plan.outline.map((o, i) => `${i + 1}. ${o}`).join('\n')}\n` : '')
-    const note = await createNote({ title: 'Research Plan', content: md, tags: ['plan'] })
-    upsertNote(note)
-    openTab(note.id)
+  function planMarkdown(p: ResearchPlan): string {
+    return (
+      `# Research Plan\n\n${p.summary}\n\n` +
+      (p.questions.length ? `## Research Questions\n${p.questions.map((q) => `- ${q}`).join('\n')}\n\n` : '') +
+      (p.subtopics.length ? `## Key Subtopics\n${p.subtopics.map((s) => `- ${s}`).join('\n')}\n\n` : '') +
+      (p.searches.length ? `## Searches to Run\n${p.searches.map((s) => `- ${s}`).join('\n')}\n\n` : '') +
+      (p.outline.length ? `## Outline\n${p.outline.map((o, i) => `${i + 1}. ${o}`).join('\n')}\n` : '')
+    )
   }
 
   const Section = ({ title, items }: { title: string; items: string[] }) =>
@@ -133,17 +128,9 @@ export function ResearchAssistant({ onRunSearch }: Props) {
           <Section title="Key Subtopics" items={plan.subtopics} />
           <Section title="Outline" items={plan.outline} />
 
-          <button
-            onClick={savePlanToNote}
-            style={{
-              marginTop: '6px', padding: '7px 14px', background: 'none',
-              border: '1px solid var(--border)', borderRadius: '4px',
-              color: 'var(--text-secondary)', fontSize: '13px',
-              fontFamily: 'var(--font-ui)', cursor: 'pointer',
-            }}
-          >
-            Save plan to a note
-          </button>
+          <div style={{ marginTop: '6px', padding: '7px 12px', display: 'inline-block', border: '1px solid var(--border)', borderRadius: '4px' }}>
+            <SaveToNoteMenu title="Research Plan" tags={['plan']} label="Save plan to note" getMarkdown={() => planMarkdown(plan)} />
+          </div>
         </div>
       )}
     </div>

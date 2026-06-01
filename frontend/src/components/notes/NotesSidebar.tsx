@@ -11,6 +11,7 @@ export function NotesSidebar() {
   const [newTitle, setNewTitle] = useState('')
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [menuFor, setMenuFor] = useState<string | null>(null)
+  const [dragOver, setDragOver] = useState<string | null>(null) // folder name or '__root__'
 
   const allTags = Array.from(new Set(notes.flatMap((n) => n.tags)))
   const folders = Array.from(new Set(notes.map((n) => n.folder).filter(Boolean))) as string[]
@@ -49,9 +50,25 @@ export function NotesSidebar() {
     setCollapsed((p) => { const n = new Set(p); n.has(name) ? n.delete(name) : n.add(name); return n })
   }
 
+  async function onDropToFolder(e: React.DragEvent, folder: string | null) {
+    e.preventDefault()
+    setDragOver(null)
+    const noteId = e.dataTransfer.getData('text/note-id')
+    const note = notes.find((n) => n.id === noteId)
+    if (note && (note.folder || null) !== folder) moveTo(note, folder)
+  }
+
+  const dropProps = (key: string, folder: string | null) => ({
+    onDragOver: (e: React.DragEvent) => { e.preventDefault(); setDragOver(key) },
+    onDragLeave: () => setDragOver((d) => (d === key ? null : d)),
+    onDrop: (e: React.DragEvent) => onDropToFolder(e, folder),
+  })
+
   const noteRow = (note: Note) => (
     <div
       key={note.id}
+      draggable
+      onDragStart={(e) => { e.dataTransfer.setData('text/note-id', note.id); e.dataTransfer.effectAllowed = 'move' }}
       onClick={() => openTab(note.id)}
       style={{
         position: 'relative',
@@ -179,11 +196,18 @@ export function NotesSidebar() {
         {!filtering && folders.map((folder) => {
           const inFolder = visibleNotes.filter((n) => n.folder === folder)
           const isCollapsed = collapsed.has(folder)
+          const isTarget = dragOver === folder
           return (
             <div key={folder}>
               <div
                 onClick={() => toggleFolder(folder)}
-                style={{ padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--bg-rail)', borderBottom: '1px solid var(--border-light)' }}
+                {...dropProps(folder, folder)}
+                style={{
+                  padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                  background: isTarget ? 'rgba(167,139,250,0.18)' : 'var(--bg-rail)',
+                  borderBottom: '1px solid var(--border-light)',
+                  boxShadow: isTarget ? 'inset 0 0 0 1px var(--accent)' : 'none',
+                }}
               >
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{isCollapsed ? '▸' : '▾'}</span>
                 <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-ui)', flex: 1 }}>📁 {folder}</span>
@@ -194,8 +218,24 @@ export function NotesSidebar() {
           )
         })}
 
-        {/* root notes */}
-        {rootNotes.map(noteRow)}
+        {/* root notes (also the drop zone to remove a note from a folder) */}
+        {!filtering && folders.length > 0 && (
+          <div
+            {...dropProps('__root__', null)}
+            style={{
+              padding: '5px 12px', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em',
+              color: dragOver === '__root__' ? 'var(--accent-light)' : 'var(--text-faint)',
+              background: dragOver === '__root__' ? 'rgba(167,139,250,0.18)' : 'transparent',
+              boxShadow: dragOver === '__root__' ? 'inset 0 0 0 1px var(--accent)' : 'none',
+              borderBottom: '1px solid var(--border-light)',
+            }}
+          >
+            Notes {dragOver === '__root__' ? '— drop to remove from folder' : ''}
+          </div>
+        )}
+        <div {...dropProps('__root__', null)} style={{ minHeight: '40px' }}>
+          {rootNotes.map(noteRow)}
+        </div>
       </div>
     </div>
   )

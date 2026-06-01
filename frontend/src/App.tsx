@@ -1,4 +1,5 @@
 import { PanelControls } from './components/layout/PanelControls'
+import { LayoutMenu } from './components/layout/LayoutMenu'
 import { SplitView } from './components/layout/SplitView'
 
 export default function App() {
@@ -25,6 +26,8 @@ export default function App() {
         </span>
         <div style={{ width: '1px', height: '16px', background: 'var(--border)' }} />
         <PanelControls />
+        <div style={{ flex: 1 }} />
+        <LayoutMenu />
       </div>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
         <SplitView />

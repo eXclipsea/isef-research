@@ -12,6 +12,8 @@ interface LayoutState {
   togglePanel: (id: PanelId) => void
   stackLeft: (id: PanelId) => void   // merge into the column to the left (stack)
   splitOut: (id: PanelId) => void    // give the panel its own column
+  setColumns: (columns: Columns) => void
+  movePanel: (id: PanelId, target: { col: number; stack: boolean }) => void
 }
 
 function locate(columns: Columns, id: PanelId): [number, number] | null {
@@ -70,6 +72,24 @@ export const useLayoutStore = create<LayoutState>()(
           cols[c] = cols[c].filter((p) => p !== id)
           cols.splice(c + 1, 0, [id])
           return { columns: prune(cols) }
+        }),
+
+      setColumns: (columns) => set({ columns: prune(columns.map((c) => [...c])) }),
+
+      // drag a panel into a target column (stack=true appends to that column,
+      // stack=false inserts it as a new column at that position)
+      movePanel: (id, target) =>
+        set((s) => {
+          const loc = locate(s.columns, id)
+          if (!loc) return s
+          let cols = s.columns.map((col) => col.filter((p) => p !== id))
+          if (target.stack && cols[target.col]) {
+            cols[target.col] = [...cols[target.col], id]
+          } else {
+            cols.splice(target.col, 0, [id])
+          }
+          cols = prune(cols)
+          return cols.flat().length ? { columns: cols } : s
         }),
     }),
     { name: 'researchos-layout-v2' }
