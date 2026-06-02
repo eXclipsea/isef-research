@@ -29,10 +29,10 @@ Search uses a local engine (SearXNG) plus free scholarly APIs
 To let a friend run their own copy, they just need a Mac with a few free
 tools installed, then one command:
 
-1. **Install the prerequisites** (one-time, all free):
-   - [Ollama](https://ollama.com/download) — the local AI
-   - [Node.js](https://nodejs.org) and [Python 3.11+](https://python.org)
-     (or `brew install node python3`)
+1. **Install the prerequisites** (one-time, all free) — Ollama, Node.js,
+   Python 3.11+. **Step-by-step guide with copy-paste commands:
+   [INSTALL.md](INSTALL.md).** (Shortcut if you have Homebrew:
+   `brew install node python3 && brew install --cask ollama`.)
 2. **Clone and set up:**
    ```bash
    git clone https://github.com/eXclipsea/isef-research.git
