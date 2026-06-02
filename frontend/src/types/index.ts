@@ -68,6 +68,16 @@ export interface TopicsResult {
   overview: string
 }
 
+export interface DocHit {
+  doc_id: string
+  title: string
+  kind: 'pdf' | 'paper'
+  page: number | null
+  chunk_index: number | null
+  snippet: string
+  distance: number
+}
+
 export interface ResearchPlan {
   summary: string
   questions: string[]

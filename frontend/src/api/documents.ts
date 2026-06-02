@@ -1,7 +1,14 @@
-import type { Document, RAGAnswer, PaperResult, WebResult, TopicsResult } from '../types'
+import type { Document, RAGAnswer, PaperResult, WebResult, TopicsResult, DocHit } from '../types'
 import { jsonOrThrow } from './http'
 
 const BASE = '/api/documents'
+
+export async function searchLibrary(q: string): Promise<DocHit[]> {
+  const data = await jsonOrThrow<{ hits: DocHit[] }>(
+    await fetch(`${BASE}/search?q=${encodeURIComponent(q)}`)
+  )
+  return data.hits
+}
 
 export async function addPapersToResearch(
   papers: (PaperResult | WebResult)[]

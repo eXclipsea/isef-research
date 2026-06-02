@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from .parser import parse_pdf
-from .rag import ingest_chunks, query_document, delete_collection, extract_key_points
+from .rag import ingest_chunks, query_document, delete_collection, extract_key_points, search_all_documents
 from .paper_ingest import ingest_paper
 from ..llm import OllamaUnavailable
 from ..search.synthesizer import extract_topics
@@ -100,6 +100,18 @@ async def upload_document(file: UploadFile = File(...)):
     }
     save_meta(doc_id, meta)
     return meta
+
+
+@router.get("/search")
+def offline_document_search(q: str = ""):
+    """Offline semantic search across all collected documents."""
+    if not q.strip():
+        return {"hits": []}
+    metas = list_all_meta()
+    try:
+        return {"hits": search_all_documents(q, metas)}
+    except OllamaUnavailable as e:
+        raise HTTPException(503, str(e))
 
 
 @router.post("/from-papers")

@@ -7,10 +7,11 @@ import { SearchSummary } from './SearchSummary'
 import { SourceCard } from './SourceCard'
 import { ResearchAssistant } from './ResearchAssistant'
 import { Citations } from './Citations'
+import { LibrarySearch } from './LibrarySearch'
 
 type Mode = 'all' | 'web' | 'papers'
 type Status = 'idle' | 'loading' | 'done'
-type View = 'search' | 'assistant'
+type View = 'search' | 'assistant' | 'library'
 
 export function SearchPanel() {
   const [view, setView] = useState<View>('search')
@@ -92,11 +93,14 @@ export function SearchPanel() {
       {/* view tabs */}
       <div style={{ display: 'flex', gap: '18px', padding: '10px 16px 0', background: 'var(--bg-panel)', flexShrink: 0 }}>
         {tab('search', 'Search')}
+        {tab('library', 'Library (offline)')}
         {tab('assistant', 'Plan my research')}
       </div>
 
       {view === 'assistant' ? (
         <ResearchAssistant onRunSearch={(q) => runSearch(q)} />
+      ) : view === 'library' ? (
+        <LibrarySearch />
       ) : (
         <>
           {/* search bar */}

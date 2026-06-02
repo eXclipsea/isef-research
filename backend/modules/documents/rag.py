@@ -78,6 +78,36 @@ def query_document(doc_id: str, filename: str, question: str, n_results: int = 5
     return {"answer": answer, "citations": citations}
 
 
+def search_all_documents(query: str, metas: list[dict], per_doc: int = 3, total: int = 25) -> list[dict]:
+    """Semantic search across every document collection — fully offline
+    (local embeddings + local vector DB, no internet)."""
+    q_emb = embed_text(query)
+    hits: list[dict] = []
+    for meta in metas:
+        doc_id = meta["id"]
+        col = _collection(doc_id)
+        n = col.count()
+        if n == 0:
+            continue
+        res = col.query(
+            query_embeddings=[q_emb],
+            n_results=min(per_doc, n),
+            include=["documents", "metadatas", "distances"],
+        )
+        for doc, m, dist in zip(res["documents"][0], res["metadatas"][0], res["distances"][0]):
+            hits.append({
+                "doc_id": doc_id,
+                "title": meta.get("title") or meta.get("filename"),
+                "kind": meta.get("kind", "pdf"),
+                "page": m.get("page"),
+                "chunk_index": m.get("chunk_index"),
+                "snippet": doc[:300].strip(),
+                "distance": dist,
+            })
+    hits.sort(key=lambda h: h["distance"])
+    return hits[:total]
+
+
 def delete_collection(doc_id: str):
     try:
         _client.delete_collection(f"doc_{doc_id}")
