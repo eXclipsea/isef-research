@@ -48,7 +48,7 @@ npm run build --silent 2>/dev/null
 
 # 3. SearXNG (web + paper search)
 echo "  → Starting search engine (port 8080)…"
-SEARXNG_SETTINGS_PATH="$ROOT/searxng/searxng-settings.yml" \
+SEARXNG_SETTINGS_PATH="$ROOT/searxng-settings.yml" \
   "$ROOT/searxng/venv/bin/python3" -m searx.webapp \
   > "$ROOT/searxng/searxng.log" 2>&1 &
 SEARXNG_PID=$!

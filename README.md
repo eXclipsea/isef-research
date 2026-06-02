@@ -6,21 +6,51 @@ A fully local AI research tool for ISEF. Replaces Perplexity, Anara, and Obsidia
 
 ---
 
-## Quick Start
-
-**As an app (recommended):** double-click **ResearchOS.app**.
-It starts Ollama, the search engine, and the backend, then opens a
-dedicated window. (Build it once with `./build-app.sh` if it isn't there.)
-
-**From the terminal:**
+## Quick Start (first time)
 
 ```bash
-./start.sh
+git clone https://github.com/eXclipsea/isef-research.git
+cd isef-research
+./setup.sh        # installs everything, one time
+./start.sh        # launches the app
 ```
 
-Opens at **http://localhost:8000** automatically.
+After setup, **double-click ResearchOS.app** (built for your machine by
+`setup.sh`) or run `./start.sh`. Opens at **http://localhost:8000**.
 
-That's it. One command starts everything (Ollama, SearXNG, backend).
+---
+
+## Sharing it with friends
+
+**There are no API keys to hand out — the app is fully local and free.**
+Search uses a local engine (SearXNG) plus free scholarly APIs
+(Semantic Scholar, arXiv, PubMed, CrossRef) that need no keys.
+
+To let a friend run their own copy, they just need a Mac with a few free
+tools installed, then one command:
+
+1. **Install the prerequisites** (one-time, all free):
+   - [Ollama](https://ollama.com/download) — the local AI
+   - [Node.js](https://nodejs.org) and [Python 3.11+](https://python.org)
+     (or `brew install node python3`)
+2. **Clone and set up:**
+   ```bash
+   git clone https://github.com/eXclipsea/isef-research.git
+   cd isef-research
+   ./setup.sh
+   ```
+   `setup.sh` checks the prerequisites, installs all dependencies, downloads
+   the AI models, sets up the local search engine, and builds their own
+   `ResearchOS.app`.
+3. **Run it:** `./start.sh` (or double-click ResearchOS.app).
+
+### Optional keys (not required)
+Everything works without keys. If a friend *wants* extras, they create their
+own `backend/.env` (copy from `backend/.env.example`):
+- `EMAIL` — used by the free Unpaywall API to find open-access PDFs.
+- `BRAVE_API_KEY` — a free [Brave Search](https://brave.com/search/api) key,
+  only used as a fallback if SearXNG isn't running. Each person gets their
+  own from Brave's site.
 
 ---
 

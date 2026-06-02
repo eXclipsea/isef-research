@@ -22,6 +22,9 @@ backend/data/notes.db
 *.log
 app-launch.log
 
+# Machine-specific app bundle (has an absolute path baked in — build with setup.sh)
+ResearchOS.app/
+
 # OS
 .DS_Store
 Thumbs.db
