@@ -27,7 +27,7 @@ def _dedup(*lists) -> list[dict]:
 class SearchBody(BaseModel):
     query: str
     mode: Literal["web", "papers", "all"] = "all"
-    num_results: int = 8
+    num_results: int = 30
 
 
 class SourceRef(BaseModel):
@@ -76,9 +76,10 @@ async def search(body: SearchBody):
 
     if body.mode in ("papers", "all"):
         try:
+            per_source = max(10, body.num_results // 2)
             searxng_sci, api_papers = await asyncio.gather(
-                searxng_papers(body.query, count=5),
-                search_all_papers(body.query, limit_each=3),
+                searxng_papers(body.query, count=body.num_results),
+                search_all_papers(body.query, limit_each=per_source),
                 return_exceptions=True,
             )
             sci = searxng_sci if isinstance(searxng_sci, list) else []
@@ -89,8 +90,10 @@ async def search(body: SearchBody):
         except Exception as e:
             warnings.append(f"Paper search failed: {e}")
 
-    all_sources = web_results + paper_results
-    summary = synthesize(body.query, all_sources[:10])
+    # synthesis numbering matches the UI (papers listed first, then web);
+    # only the top sources go to the LLM so its context stays manageable
+    all_sources = paper_results + web_results
+    summary = synthesize(body.query, all_sources[:12])
 
     return {
         "summary": summary,

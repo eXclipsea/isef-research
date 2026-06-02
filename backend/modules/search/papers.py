@@ -8,7 +8,7 @@ import httpx
 EMAIL = os.getenv("EMAIL", "research@example.com")
 
 
-async def search_semantic_scholar(query: str, limit: int = 5) -> list[dict]:
+async def search_semantic_scholar(query: str, limit: int = 15) -> list[dict]:
     url = "https://api.semanticscholar.org/graph/v1/paper/search"
     params = {
         "query": query,
@@ -41,7 +41,7 @@ async def search_semantic_scholar(query: str, limit: int = 5) -> list[dict]:
     return results
 
 
-async def search_arxiv(query: str, limit: int = 5) -> list[dict]:
+async def search_arxiv(query: str, limit: int = 15) -> list[dict]:
     url = "http://export.arxiv.org/api/query"
     params = {
         "search_query": f"all:{query}",
@@ -86,7 +86,7 @@ async def search_arxiv(query: str, limit: int = 5) -> list[dict]:
     return results
 
 
-async def search_pubmed(query: str, limit: int = 5) -> list[dict]:
+async def search_pubmed(query: str, limit: int = 15) -> list[dict]:
     base = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
     params_search = {
         "db": "pubmed",
@@ -172,7 +172,7 @@ async def get_unpaywall_pdf(doi: str) -> str | None:
     return None
 
 
-async def search_all_papers(query: str, limit_each: int = 5) -> list[dict]:
+async def search_all_papers(query: str, limit_each: int = 15) -> list[dict]:
     results = await asyncio.gather(
         search_semantic_scholar(query, limit_each),
         search_arxiv(query, limit_each),

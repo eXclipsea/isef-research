@@ -6,6 +6,7 @@ import type { SearchResponse, PaperResult, WebResult } from '../../types'
 import { SearchSummary } from './SearchSummary'
 import { SourceCard } from './SourceCard'
 import { ResearchAssistant } from './ResearchAssistant'
+import { Citations } from './Citations'
 
 type Mode = 'all' | 'web' | 'papers'
 type Status = 'idle' | 'loading' | 'done'
@@ -15,6 +16,7 @@ export function SearchPanel() {
   const [view, setView] = useState<View>('search')
   const [query, setQuery] = useState('')
   const [mode, setMode] = useState<Mode>('all')
+  const [numResults, setNumResults] = useState(30)
   const [status, setStatus] = useState<Status>('idle')
   const [result, setResult] = useState<SearchResponse | null>(null)
   const [selected, setSelected] = useState<Set<number>>(new Set())
@@ -37,7 +39,7 @@ export function SearchPanel() {
     setError(null)
     setAdded(null)
     try {
-      setResult(await doSearch(q, m))
+      setResult(await doSearch(q, m, numResults))
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Search failed. Is the backend running?')
     } finally {
@@ -144,6 +146,21 @@ export function SearchPanel() {
                     {m}
                   </button>
                 ))}
+                <div style={{ flex: 1 }} />
+                <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
+                  results
+                  <select
+                    value={numResults}
+                    onChange={(e) => setNumResults(Number(e.target.value))}
+                    style={{
+                      background: 'var(--bg-base)', color: 'var(--text-secondary)',
+                      border: '1px solid var(--border)', borderRadius: '4px',
+                      fontSize: '12px', fontFamily: 'var(--font-ui)', padding: '1px 4px', outline: 'none',
+                    }}
+                  >
+                    {[20, 30, 50, 80].map((n) => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </label>
               </div>
             </form>
           </div>
@@ -204,6 +221,8 @@ export function SearchPanel() {
                     })}
                   </div>
                 )}
+
+                <Citations papers={result.paper_results} web={result.web_results} query={query} />
               </>
             )}
           </div>

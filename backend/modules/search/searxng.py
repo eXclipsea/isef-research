@@ -3,33 +3,43 @@ import httpx
 SEARXNG_URL = "http://localhost:8080/search"
 
 
-async def searxng_search(query: str, count: int = 10, categories: str = "general") -> list[dict]:
-    params = {
-        "q": query,
-        "format": "json",
-        "categories": categories,
-        "pageno": 1,
-    }
+async def searxng_search(query: str, count: int = 30, categories: str = "general") -> list[dict]:
+    """Fetch up to `count` results, paginating SearXNG (≈10-20 per page)."""
+    results: list[dict] = []
+    seen: set[str] = set()
+    max_pages = 6
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.get(SEARXNG_URL, params=params)
-            r.raise_for_status()
-            data = r.json()
-    except Exception as e:
-        return []
+        async with httpx.AsyncClient(timeout=20) as client:
+            for page in range(1, max_pages + 1):
+                if len(results) >= count:
+                    break
+                r = await client.get(SEARXNG_URL, params={
+                    "q": query,
+                    "format": "json",
+                    "categories": categories,
+                    "pageno": page,
+                })
+                r.raise_for_status()
+                items = r.json().get("results", [])
+                if not items:
+                    break
+                for item in items:
+                    url = item.get("url", "")
+                    if not url or url in seen:
+                        continue
+                    seen.add(url)
+                    results.append({
+                        "title": item.get("title", ""),
+                        "url": url,
+                        "snippet": item.get("content", ""),
+                        "source": item.get("engine", "searxng"),
+                    })
+    except Exception:
+        pass
+    return results[:count]
 
-    results = []
-    for item in data.get("results", [])[:count]:
-        results.append({
-            "title": item.get("title", ""),
-            "url": item.get("url", ""),
-            "snippet": item.get("content", ""),
-            "source": item.get("engine", "searxng"),
-        })
-    return results
 
-
-async def searxng_papers(query: str, count: int = 10) -> list[dict]:
+async def searxng_papers(query: str, count: int = 20) -> list[dict]:
     return await searxng_search(query, count=count, categories="science")
 
 

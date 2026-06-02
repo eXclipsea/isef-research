@@ -22,11 +22,15 @@ export async function generateTopics(
   }))
 }
 
-export async function doSearch(query: string, mode: 'web' | 'papers' | 'all' = 'all'): Promise<SearchResponse> {
+export async function doSearch(
+  query: string,
+  mode: 'web' | 'papers' | 'all' = 'all',
+  numResults = 30
+): Promise<SearchResponse> {
   return jsonOrThrow(await fetch(BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, mode }),
+    body: JSON.stringify({ query, mode, num_results: numResults }),
   }))
 }
 
