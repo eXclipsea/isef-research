@@ -198,22 +198,35 @@ export function NotesSidebar() {
           const isCollapsed = collapsed.has(folder)
           const isTarget = dragOver === folder
           return (
-            <div key={folder}>
+            // the whole folder block is a drop target — drop a note anywhere in
+            // it (header or note list) to move it into this folder
+            <div
+              key={folder}
+              {...dropProps(folder, folder)}
+              style={{
+                background: isTarget ? 'rgba(167,139,250,0.10)' : 'transparent',
+                boxShadow: isTarget ? 'inset 0 0 0 2px var(--accent)' : 'none',
+              }}
+            >
               <div
                 onClick={() => toggleFolder(folder)}
-                {...dropProps(folder, folder)}
                 style={{
                   padding: '6px 12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
                   background: isTarget ? 'rgba(167,139,250,0.18)' : 'var(--bg-rail)',
                   borderBottom: '1px solid var(--border-light)',
-                  boxShadow: isTarget ? 'inset 0 0 0 1px var(--accent)' : 'none',
                 }}
               >
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{isCollapsed ? '▸' : '▾'}</span>
                 <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-ui)', flex: 1 }}>📁 {folder}</span>
-                <span style={{ fontSize: '11px', color: 'var(--text-faint)' }}>{inFolder.length}</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-faint)' }}>
+                  {isTarget ? 'drop here' : inFolder.length}
+                </span>
               </div>
               {!isCollapsed && inFolder.map(noteRow)}
+              {/* small landing strip so an empty/short folder is still easy to hit */}
+              {!isCollapsed && (
+                <div style={{ height: '10px' }} />
+              )}
             </div>
           )
         })}
