@@ -215,10 +215,9 @@ async def get_citation(doc_id: str, style: str = "apa"):
             except Exception:
                 pass
 
-    # fallback: construct from filename
-    name = re.sub(r'\.pdf$', '', meta["filename"], flags=re.I)
-    citation = f"{name}. (n.d.). [PDF document]. Retrieved from local upload."
-    return {"citation": citation, "doi": doi, "style": style}
+    # no DOI (or CrossRef failed): build a real per-style citation from metadata
+    from .cite import format_citation
+    return {"citation": format_citation(meta, style), "doi": doi, "style": style}
 
 
 @router.get("/{doc_id}/file")

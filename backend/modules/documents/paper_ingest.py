@@ -12,18 +12,36 @@ import httpx
 from .parser import parse_pdf, chunk_pages
 from .rag import ingest_chunks, delete_collection
 from ..llm import OllamaUnavailable
+from ..search.papers import get_unpaywall_pdf
 
 UPLOADS_DIR = Path(__file__).parent.parent.parent / "data" / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 async def _download_pdf(url: str, dest: Path) -> bool:
+    """Download `url` if it's really a PDF (detected by the %PDF magic bytes,
+    not just the content-type header which many servers get wrong)."""
     try:
-        async with httpx.AsyncClient(timeout=25, follow_redirects=True) as client:
-            r = await client.get(url, headers={"User-Agent": "ResearchOS/1.0"})
-            ctype = r.headers.get("content-type", "")
-            if r.status_code == 200 and ("pdf" in ctype.lower() or url.lower().endswith(".pdf")):
-                dest.write_bytes(r.content)
+        async with httpx.AsyncClient(timeout=30, follow_redirects=True) as client:
+            r = await client.get(url, headers={
+                "User-Agent": "Mozilla/5.0 (ResearchOS; academic use)",
+                "Accept": "application/pdf,*/*",
+            })
+            if r.status_code != 200:
+                return False
+            content = r.content
+            ctype = r.headers.get("content-type", "").lower()
+            looks_pdf = (
+                content[:5] == b"%PDF-"            # magic bytes — most reliable
+                or "pdf" in ctype
+                or url.lower().split("?")[0].endswith(".pdf")
+            )
+            # guard against tiny error pages masquerading as PDFs
+            if looks_pdf and content[:5] == b"%PDF-":
+                dest.write_bytes(content)
+                return True
+            if looks_pdf and len(content) > 1000:
+                dest.write_bytes(content)
                 return True
     except Exception:
         pass
@@ -40,9 +58,20 @@ async def ingest_paper(paper: dict) -> dict:
     pdf_dest = UPLOADS_DIR / f"{doc_id}.pdf"
 
     has_pdf = False
+    # 1) try the direct open-access PDF link from the search result
     pdf_url = paper.get("pdf_url")
     if pdf_url:
         has_pdf = await _download_pdf(pdf_url, pdf_dest)
+
+    # 2) fall back to Unpaywall via the DOI (finds a free legal PDF if one exists)
+    if not has_pdf and paper.get("doi"):
+        unpaywall_url = await get_unpaywall_pdf(paper["doi"])
+        if unpaywall_url:
+            has_pdf = await _download_pdf(unpaywall_url, pdf_dest)
+
+    # 3) last resort: if the source page itself is a PDF link
+    if not has_pdf and (paper.get("url") or "").lower().split("?")[0].endswith(".pdf"):
+        has_pdf = await _download_pdf(paper["url"], pdf_dest)
 
     # build chunks from the PDF if we got one, else from abstract/snippet text
     if has_pdf:
