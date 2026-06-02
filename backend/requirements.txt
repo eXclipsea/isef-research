@@ -9,3 +9,4 @@ ollama
 python-multipart
 aiofiles
 python-dotenv
+pywebview

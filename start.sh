@@ -69,7 +69,9 @@ echo "  Logs:  backend/backend.log · searxng/searxng.log · ollama.log"
 echo "  Press Ctrl+C to stop."
 echo ""
 
-if [ "${RESEARCHOS_APP_MODE:-0}" = "1" ] && [ -d "/Applications/Google Chrome.app" ]; then
+if [ "${RESEARCHOS_NO_OPEN:-0}" = "1" ]; then
+  : # the native app launcher opens its own window
+elif [ "${RESEARCHOS_APP_MODE:-0}" = "1" ] && [ -d "/Applications/Google Chrome.app" ]; then
   # dedicated, chromeless app window (its own profile so it looks like a native app)
   open -na "Google Chrome" --args \
     --app="http://localhost:8000" \
